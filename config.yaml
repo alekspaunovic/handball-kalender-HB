@@ -1,0 +1,118 @@
+# Konfiguration für die Handball-Kalender-Feeds TB Wülfrath, 1. Herren.
+# Siehe SPEC.md für die vollständige Spezifikation.
+
+timezone: Europe/Berlin
+feed_ttl: PT6H
+uid_prefix: tbw
+
+output_dir: docs
+archive_dir: data
+
+# Manuelle Eingriffe (SPEC-ADMIN.md). overrides_path wird nur gelesen, nie
+# vom Skript geschrieben -- geschrieben wird sie ausschliesslich von der
+# Admin-Oberflaeche. Fehlt sie oder ist sie fehlerhaft, laufen alle Feeds
+# trotzdem durch.
+overrides_path: overrides.json
+pool_file: pool.json
+extra_feed_key: extra
+extra_calname: TBW Extra
+# Name und Farbe des Extra-Feeds in der Admin-Oberflaeche (Uebersicht). Die
+# Farbe steht fuer "liegt im Extra-Feed", egal aus welchem Team der Termin
+# stammt.
+extra_anzeigename: Extra
+extra_farbe: "#5a6270"
+extra_farbe_dunkel: "#9aa3b0"
+
+# SpielerPlus-URLs kommen ausschliesslich aus Umgebungsvariablen (GitHub
+# Secrets bzw. lokale .env), niemals aus dieser Datei. Hier steht nur, unter
+# welchem Variablennamen das Skript die URL je Team erwartet.
+#
+# Fehlt eine dieser Variablen, wird der zugehörige Training-Feed
+# übersprungen, ohne dass das Skript abbricht.
+#
+# kurzname, farbe und farbe_dunkel braucht nur die Admin-Oberflaeche; sie
+# bekommt sie ueber docs/pool.json. farbe gilt im hellen, farbe_dunkel im
+# dunklen Modus. Die Farben haben gleiche Helligkeit und Saettigung, damit
+# keine laut wird.
+teams:
+  m1:
+    anzeigename: "1. Herren"
+    kurzname: "M1"
+    farbe: "#0f7b8a"
+    farbe_dunkel: "#4fb3c0"
+    handballnet_name: "TB Wülfrath"
+    handballnet_team_id: 75787
+    spielerplus_env: SPIELERPLUS_M1
+    treffpunkt_spiel_minuten: 75
+    treffpunkt_training_minuten: 5
+    spieldauer_minuten: 90
+
+  # Fremdteams (SPEC-ADMIN.md Abschnitt 3): reine Pool-Quellen. Sie landen
+  # nie automatisch in einem Feed, sondern nur in docs/pool.json, aus dem
+  # einzelne Spiele von Hand freigeschaltet werden. own: false steuert
+  # beides -- own_team im Pool und den Wegfall der Treffpunkt-Notiz, denn das
+  # sind Zuschauertermine.
+  #
+  # handballnet_name fehlt hier absichtlich: der Eigenname fuer die
+  # Gegnererkennung wird aus dem X-WR-CALNAME des jeweiligen Feeds gelesen.
+  # Das Kuerzel steckt dauerhaft in der UID und darf sich nie aendern.
+  "1-damen":
+    anzeigename: "1. Damen"
+    farbe: "#b83280"
+    farbe_dunkel: "#e069ab"
+    handballnet_team_id: 76182
+    spieldauer_minuten: 90
+    own: false
+  "2-herren":
+    anzeigename: "2. Herren"
+    farbe: "#2b6cb0"
+    farbe_dunkel: "#6ba3e0"
+    handballnet_team_id: 74503
+    spieldauer_minuten: 90
+    own: false
+
+  # Gemerkte Spiele (SPEC-ADMIN.md Abschnitt 3). Kein echtes Team: die Quelle
+  # ist ein Abruf pro Spielnummer aus overrides.json, deshalb gibt es hier
+  # keine handballnet_team_id. Steht trotzdem als Team und Feed in der
+  # Konfiguration, damit Pool und Extra-Feed es wie jeden anderen Feed
+  # behandeln koennen.
+  watch:
+    anzeigename: "Gemerktes Spiel"
+    farbe: "#5a6270"
+    farbe_dunkel: "#9aa3b0"
+    spieldauer_minuten: 90
+    own: false
+
+# Zwei Ausgabe-Feeds gemaess SPEC.md Abschnitt 3. calname wird zu
+# "TBW <Anzeigename> Training" bzw. "TBW <Anzeigename> Spiele" aufgeloest,
+# hier also "TBW 1. Herren Training" und "TBW 1. Herren Spiele".
+# Dazu die Pool-Quellen mit pool_only: true -- sie fuellen Archiv und Pool,
+# schreiben aber keine eigene .ics-Datei.
+feeds:
+  m1-training: {team: m1, type: training}
+  m1-spiele: {team: m1, type: spiele}
+  1-damen-spiele: {team: "1-damen", type: spiele, pool_only: true}
+  2-herren-spiele: {team: "2-herren", type: spiele, pool_only: true}
+  # source: watch -- nicht ein Team-Feed, sondern ein Abruf pro Spielnummer.
+  watch-spiele: {team: watch, type: spiele, pool_only: true, source: watch}
+
+# Handeinträge zur Korrektur einzelner Gegnernamen, siehe Abschnitt 6.
+# Wird vor allen Normalisierungsregeln geprueft. Schluessel = Rohname aus
+# handball.net (SUMMARY-Seite), Wert = gewuenschte Schreibweise.
+#
+# Hier gehoeren nur echte Einzelfaelle hin, die keine Regel herleiten kann.
+# Alles Systematische (Grossschreibung, Mannschaftskennungen, Rechtsform)
+# erledigen die Regeln in names.py.
+opponent_overrides:
+  # Derselbe Verein kommt in zwei Schreibweisen aus der Quelle. Ohne diesen
+  # Eintrag stehen beide Varianten im selben Kalender.
+  "Kettwiger Sportverein 70/86": "Kettwiger SV 70/86"
+
+# Positivliste der SpielerPlus-UID-Praefixe, die in die Training-Feeds
+# uebernommen werden (SPEC.md Abschnitt 2). Alles andere wird verworfen --
+# die bekannten Praefixe "game" (Spiele, kommen aus handball.net) und
+# "absence" (Abwesenheiten) stillschweigend, unbekannte Praefixe mit einer
+# Warnung im Log.
+spielerplus_uid_prefixes:
+  - training
+  - event

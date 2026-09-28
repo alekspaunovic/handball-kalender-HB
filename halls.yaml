@@ -1,0 +1,59 @@
+# Hallentabelle, siehe Abschnitt 8 der Spezifikation.
+#
+# Jede Halle hat eine Liste `search_terms`: normalisierte Suchbegriffe
+# (kleingeschrieben, Umlaute transliteriert ue/oe/ae/ss, ohne Sonderzeichen
+# und Leerzeichen). Das Skript normalisiert eingehende Ortszusaetze und
+# LOCATION-Strings auf die gleiche Weise und vergleicht dagegen. `search_terms`
+# duerfen auch als Teilstring vorkommen.
+#
+# `exact_terms` sind Suchbegriffe, die nur bei vollstaendiger Uebereinstimmung
+# zaehlen, nicht als Teilstring -- fuer generische Woerter, die sonst in
+# fremden Hallennamen (z.B. "Sporthalle", "Turnhalle") faelschlich anschlagen
+# wuerden.
+#
+# `address` steht ohne das abschliessende ", Deutschland" -- das haengt der
+# ICS-Writer beim Schreiben an. `geo` ist [lat, lon] oder null, wenn noch
+# nicht ermittelt (siehe Abschnitt 13, offene Punkte). Fehlt geo, werden GEO
+# und X-APPLE-STRUCTURED-LOCATION im Output einfach weggelassen.
+
+fliethe:
+  name: Sporthalle Fliethe
+  search_terms:
+    - fliethe
+    - mtc arena wülfrath
+  # SpielerPlus gibt den Trainingsort teils explizit als "Halle" an, gemeint
+  # ist die Standardhalle Fliethe. Nur als exakter Treffer, sonst wuerde
+  # "Halle" in vielen fremden Hallennamen (z.B. "Sporthalle Bonn") anschlagen.
+  exact_terms:
+    - Halle
+  address: "Fortunastraße 30, 42489 Wülfrath"
+  # Verifiziert via OpenStreetMap/Nominatim (Adresse Fortunastraße 30,
+  # 42489 Wülfrath -> "MTC-Sporthalle").
+  geo: [51.2759225, 7.0168646]
+
+flehenberg:
+  name: Sporthalle Flehenberg
+  search_terms:
+    - flehenberg
+  address: "Flehenberg 91, 42489 Wülfrath"
+  # Verifiziert via OpenStreetMap/Nominatim.
+  geo: [51.2810503, 7.0508109]
+
+frankys_gym:
+  name: "Franky's Gym"
+  search_terms:
+    - frankys gym
+    - franky's gym
+  # PLZ korrigiert: Glockenstahlstraße 1 liegt in 42855 Remscheid
+  # (Lüttringhausen), nicht 42857 (das ist Cronenberg, ein Stadtteil von
+  # Wuppertal) -- verifiziert via OpenStreetMap/Nominatim.
+  address: "Glockenstahlstraße 1, 42855 Remscheid"
+  geo: [51.1910388, 7.1741024]
+
+erbacher_berg:
+  name: "Sportplatz Erbacher Berg (1. FC)"
+  search_terms:
+    - erbacher berg
+  address: "Silberberger Weg 3, Innenstadt, 42489 Wülfrath"
+  # Verifiziert via OpenStreetMap/Nominatim.
+  geo: [51.2883843, 7.0312878]

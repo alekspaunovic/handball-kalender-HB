@@ -1,0 +1,100 @@
+BEGIN:VCALENDAR
+PRODID:-//spielerplus.de
+VERSION:2.0
+CALSCALE:GREGORIAN
+X-PUBLISHED-TTL:PT3H
+X-WR-TIMEZONE:Europe/Berlin
+X-WR-CALDESC:Spielplan für TB Wülfrath M3
+X-WR-CALNAME:SpielerPlus - TB Wülfrath M3
+X-WR-RELCALID:team.584396.spielerplus.de
+BEGIN:VEVENT
+UID:training.76261594
+DTSTAMP:20260902T095136Z
+SUMMARY:Training
+DESCRIPTION:https://www.spielerplus.de/training/view?id=76261594
+URL:https://www.spielerplus.de/training/view?id=76261594
+DTSTART;TZID=Europe/Berlin:20260629T190000
+DTEND;TZID=Europe/Berlin:20260629T220000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77001955
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Flehenberg
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77001955
+URL:https://www.spielerplus.de/training/view?id=77001955
+DTSTART;TZID=Europe/Berlin:20260629T190000
+DTEND;TZID=Europe/Berlin:20260629T220000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77002277
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Flehenberg Gruppe B
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77002277
+URL:https://www.spielerplus.de/training/view?id=77002277
+DTSTART;TZID=Europe/Berlin:20260629T200000
+DTEND;TZID=Europe/Berlin:20260629T230000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77001458
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Erbacher Berg
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77001458
+URL:https://www.spielerplus.de/training/view?id=77001458
+DTSTART;TZID=Europe/Berlin:20260701T190000
+DTEND;TZID=Europe/Berlin:20260701T220000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77001956
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Flehenberg
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77001956
+URL:https://www.spielerplus.de/training/view?id=77001956
+DTSTART;TZID=Europe/Berlin:20260706T190000
+DTEND;TZID=Europe/Berlin:20260706T220000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77001461
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Erbacher Berg
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77001461
+URL:https://www.spielerplus.de/training/view?id=77001461
+DTSTART;TZID=Europe/Berlin:20260708T190000
+DTEND;TZID=Europe/Berlin:20260708T220000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77001620
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Franky’s Gym
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77001620
+URL:https://www.spielerplus.de/training/view?id=77001620
+DTSTART;TZID=Europe/Berlin:20260710T200000
+DTEND;TZID=Europe/Berlin:20260710T230000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.77001957
+DTSTAMP:20260902T095136Z
+SUMMARY:Training - Flehenberg
+DESCRIPTION:https://www.spielerplus.de/training/view?id=77001957
+URL:https://www.spielerplus.de/training/view?id=77001957
+DTSTART;TZID=Europe/Berlin:20260713T190000
+DTEND;TZID=Europe/Berlin:20260713T220000
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:training.78506613
+DTSTAMP:20260909T122202Z
+SUMMARY:Training - Halle
+DESCRIPTION:https://www.spielerplus.de/training/view?id=78506613
+URL:https://www.spielerplus.de/training/view?id=78506613
+DTSTART;TZID=Europe/Berlin:20260811T190000
+DTEND;TZID=Europe/Berlin:20260811T203000
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR

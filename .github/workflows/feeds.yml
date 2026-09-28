@@ -1,0 +1,65 @@
+name: Feeds aktualisieren
+
+# SPEC.md Abschnitt 11: alle sechs Stunden per Zeitplan plus manueller
+# Trigger. Liest die SpielerPlus-URL aus dem GitHub Secret SPIELERPLUS_M1,
+# erzeugt die Feeds in docs/ und committet docs/ und data/ zurueck ins
+# Repository.
+#
+# SPEC-ADMIN.md Abschnitt 7: der Lauf schreibt zusaetzlich docs/pool.json und
+# docs/extra.ics. overrides.json wird nur gelesen und vom Workflow nie
+# veraendert -- sie steht deshalb nicht im git add unten. Schlaegt ihr Lesen
+# fehl, laeuft der Rest trotzdem durch.
+#
+# workflow_dispatch muss aktiv bleiben: darueber loest die Admin-Oberflaeche
+# den Lauf nach dem Speichern aus.
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  update-feeds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+        with:
+          # Vollstaendige Historie: der Commit-Schritt unten macht ein
+          # git pull --rebase, und das laesst sich auf einem flachen Klon
+          # (Standard ist fetch-depth 1) nicht zuverlaessig ausfuehren.
+          fetch-depth: 0
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Abhaengigkeiten installieren
+        run: pip install -e .
+
+      - name: Feeds erzeugen
+        env:
+          SPIELERPLUS_M1: ${{ secrets.SPIELERPLUS_M1 }}
+        run: python -m handball_kalender.main
+
+      - name: docs/ und data/ committen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Die Oberflaeche schreibt overrides.json waehrend der Lauf laeuft.
+          # --rebase holt diesen Commit, ohne den eigenen zu verlieren.
+          git pull --rebase --autostash
+          git add docs data
+          if git diff --cached --quiet; then
+            echo "Keine Aenderungen an den Feeds."
+          else
+            git commit -m "Feeds aktualisieren"
+            git push
+          fi
