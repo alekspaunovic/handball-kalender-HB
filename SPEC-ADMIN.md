@@ -313,83 +313,92 @@ verständlichere Regel: was in `hidden` steht, steht in keinem Kalender.
 ## 6. Die Oberfläche
 
 Eine einzelne HTML-Datei unter `docs/admin/index.html`, ohne Framework und ohne
-Abhängigkeiten von fremden Servern. Schriften über Google Fonts sind erlaubt,
-brauchen aber einen echten Fallback-Stack.
+Abhängigkeiten von fremden Servern. Schrift ist die Systemschrift, auf
+Apple-Geräten also SF Pro.
 
-Die Oberfläche wird zu 90 Prozent auf dem iPhone benutzt, oft kurz vor oder
-nach dem Training. Sie wird deshalb für den Daumen entworfen und am Desktop
-verbreitert, nicht umgekehrt.
+Die Oberfläche wird meistens auf dem iPhone benutzt, oft kurz vor oder nach
+dem Training, und daneben am Mac im Browser. Sie wird für den Daumen entworfen
+und muss am Mac genauso gut funktionieren.
 
 ### Gestaltungsrichtung
 
-Das Gegenmodell ist die typische Verwaltungsoberfläche: graue Tabelle, kleine
-Schaltflächen, alles gleich wichtig. Die App hat genau eine Aufgabe, nämlich
-Termine an- und abzuschalten. Das soll sie so selbstverständlich können wie
-eine Einkaufsliste.
+Vorbild ist Software von Apple: auf dem iPhone soll sich die Seite wie eine
+iOS-App anfühlen, am Mac wie eine macOS-App. Das Gegenmodell ist die typische
+Verwaltungsoberfläche: graue Tabelle, kleine Schaltflächen, alles gleich
+wichtig. Die App hat genau eine Aufgabe, nämlich Termine an- und abzuschalten.
+Das soll sie so selbstverständlich können wie die Einstellungen-App.
 
 Leitgedanken:
 
-- Der Terminplan ist das Interface. Keine Kacheln, keine Kästen um jede Zeile,
-  keine Schatten. Die Liste selbst trägt die Gestaltung, über Rhythmus,
-  Ausrichtung und Typografie.
+- Die Bausteine von iOS und macOS statt eigener Erfindungen: großer Titel,
+  durchscheinende Leisten, Reiterleiste mit Symbolen, gruppierte Listen mit
+  abgerundeten Ecken, Schalter, Chips, Formulare aus beschrifteten Zeilen.
+- Farben und Maße nach den Human Interface Guidelines: Systemfarben für
+  Hintergrund, Flächen, Text und Trennlinien, Blau als Akzent für
+  Bedienelemente, Grün für eingeschaltete Schalter, Rot für Absagen, Fehler
+  und Löschen.
 - Ein Blick soll reichen, um Spiel von Training und eigenes Team von fremdem
-  Team zu unterscheiden. Dafür ist die linke Kante der Zeile zuständig, nicht
-  ein Etikett im Text.
+  Team zu unterscheiden. Dafür ist die farbige Leiste links in der Zeile
+  zuständig, wie im Kalender von Apple, nicht ein Etikett im Text.
 - Der Zustand ist das Wichtigste auf dem Bildschirm. Ein ausgeblendeter Termin
   muss durchgestrichen und deutlich zurückgenommen wirken, ein
   freigeschalteter Fremdtermin sichtbar aktiv.
 - Der Schalter bedeutet in jedem Bereich dasselbe: liegt das in meinem
   Kalender? Ein Denkmodell für alle vier Listen, egal ob technisch `hidden`,
   `included` oder `watch` dahintersteht.
-- Sparsam mit Farbe. Die Teamfarben sind das einzige bunte Element, alles
-  andere ist ruhig.
+- Bunt sind nur die Teamfarben (die Systemfarben von iOS, aus `config.yaml`)
+  und der Akzent. Alles andere ist ruhig.
 
-Bewusst nicht erwünscht, weil es nach Standardvorlage aussieht: Kachelraster
-mit gleichen Rundungen und weichen Schatten, Großbuchstaben-Etiketten über
-jeder Überschrift, Verlaufsflächen als Dekoration, Pfeile hinter
-Schaltflächentexten, Einblendanimationen bei jedem Abschnitt.
+Bewusst nicht erwünscht: Verlaufsflächen als Dekoration, Schatten auf jeder
+Fläche, Einblendanimationen bei jedem Abschnitt, eigene Bedienelemente, wo
+das System schon eines hat.
 
 ### Aufbau
 
-Kopfbereich, beim Scrollen fixiert und schmal:
+**iPhone:**
 
-- links der Zeitraumfilter als Auswahlfeld
-- rechts der Speichern-Knopf, der nur erscheint, wenn es etwas zu speichern
-  gibt
+- oben eine schmale Leiste mit dem Zeitraum rechts. Darunter steht der große
+  Titel des Bereichs. Beim Scrollen wird die Leiste durchscheinend und zeigt
+  den Titel klein in der Mitte.
+- unten die Reiterleiste mit Symbol und kurzer Beschriftung: `Übersicht`,
+  `Meine`, `Andere`, `Gemerkt`, `Neu`
+- der Speichern-Knopf erscheint nur, wenn es etwas zu speichern gibt, und
+  schwebt dann über der Reiterleiste, wo der Daumen ist. Nichts in der Leiste
+  darf breiter werden als der Bildschirm.
 
-Darunter die fünf Bereiche. Auf dem Handy als Reiterleiste am unteren
-Bildschirmrand, damit sie mit dem Daumen erreichbar ist. Am Desktop als
-Navigation an der Seite.
+**Mac (ab 768 Punkt Breite):**
 
-Fünf Reiter auf 390 Punkt Bildschirmbreite gehen nur mit kurzen Beschriftungen.
-Auf dem Handy heißen sie deshalb `Übersicht`, `Meine`, `Andere`, `Gemerkt`,
-`Neu`; am Desktop, wo der Platz da ist, stehen die vollen Namen.
+- links eine Seitenleiste mit den fünf Bereichen und ihren vollen Namen
+- oben eine Werkzeugleiste mit Titel, Zeitraum und Speichern-Knopf
+- Schrift, Zeilen und Schalter in den etwas kleineren macOS-Größen
 
 Die Übersicht ist die Startansicht.
 
-Die Liste ist nach Datum gruppiert. Das Datum steht als Zwischenüberschrift,
-nicht in jeder Zeile. Eine Terminzeile enthält:
+Die Liste ist nach Datum gruppiert, jeder Tag eine abgerundete Gruppe. Das
+Datum steht als Überschrift darüber, der heutige Tag in Rot. Eine
+Terminzeile enthält:
 
 ```
-│  19:00   Training 3. Herren                        ◯
-│          Sporthalle Fliethe
+▌ 19:00   Training 1. Herren                     (  ●)
+▌ 20:30   Sporthalle Fliethe
 ```
 
-Die senkrechte Linie links trägt die Teamfarbe und ist bei Spielen kräftiger
-als bei Trainings. Die Uhrzeit steht in einer eigenen Spalte, links
-ausgerichtet, damit die Zeiten untereinander eine lesbare Kante bilden. Der
-Schalter sitzt rechts.
+Die farbige Leiste links trägt die Teamfarbe und ist bei Spielen kräftiger
+als bei Trainings. Beginn und darunter Ende stehen in einer eigenen Spalte,
+damit die Zeiten untereinander eine lesbare Kante bilden. Der Schalter sitzt
+rechts, getroffen wird die ganze Zeile.
 
-Ausgeblendete Termine: Text durchgestrichen, Deckkraft reduziert, Farblinie
-links entsättigt. Sie bleiben an ihrer Stelle in der Liste stehen.
+Ausgeblendete Termine: Text durchgestrichen und grau, Leiste grau. Sie
+bleiben an ihrer Stelle in der Liste stehen. Nicht freigeschaltete Spiele
+fremder Teams haben eine hohle Leiste.
 
 ### Zustände
 
-Leere Liste: eine Zeile in ganzen Sätzen, die sagt, was zu tun ist. Also bei
-den Fremdteams nicht "Keine Daten", sondern der Hinweis, dass hier Spiele der
-anderen Mannschaften des Vereins stehen und jedes einzeln in den Kalender
-geholt werden kann. Die Texte nennen keine Teams beim Namen -- welche Teams es
-gibt, steht allein in `config.yaml`.
+Leere Liste: ein kurzer Absatz in ganzen Sätzen, der sagt, was zu tun ist.
+Also bei den Fremdteams nicht "Keine Daten", sondern der Hinweis, dass hier
+Spiele der anderen Mannschaften des Vereins stehen und jedes einzeln in den
+Kalender geholt werden kann. Die Texte nennen keine Teams beim Namen --
+welche Teams es gibt, steht allein in `config.yaml`.
 
 Ladezustand: Die Struktur der Liste ist bereits sichtbar, während die Daten
 kommen. Kein Ladekreisel über der ganzen Seite.
@@ -399,9 +408,9 @@ Entschuldigungen, keine Fehlercodes ohne Erklärung.
 
 ### Bewegung
 
-Nur als Antwort auf eine Handlung. Der Übergang eines Termins in den
-durchgestrichenen Zustand darf kurz animiert sein, weil er zeigt, was sich
-geändert hat. Sonst nichts. `prefers-reduced-motion` wird respektiert.
+Nur als Antwort auf eine Handlung: der Schalter gleitet um, ein Termin wird
+durchgestrichen, die Leiste wird beim Scrollen durchscheinend. Sonst nichts.
+`prefers-reduced-motion` wird respektiert.
 
 ### Qualitätsanforderungen
 
@@ -409,17 +418,11 @@ geändert hat. Sonst nichts. `prefers-reduced-motion` wird respektiert.
 - Hell- und Dunkelmodus über `prefers-color-scheme`, mit Farbtokens auf
   `:root`
 - Tastaturbedienung mit sichtbarem Fokus
-- kein Text unter 15 Punkt
+- auf dem iPhone kein Text unter 15 Punkt, ausgenommen die Beschriftungen der
+  Reiterleiste; am Mac gelten die macOS-Größen
 - unter den Systemleisten des iPhones nichts abgeschnitten, also
   `viewport-fit=cover` und `env(safe-area-inset-*)` verwenden
-
-### Vorgehen beim Bauen
-
-Vor dem Schreiben des Codes einen kurzen Gestaltungsplan aufstellen: vier bis
-sechs Farbwerte mit Namen, ein bis zwei Schriftfamilien mit ihren Rollen, ein
-Layoutkonzept in zwei Sätzen. Diesen Plan gegen die Leitgedanken oben prüfen
-und begründen, warum er zu dieser App passt und nicht zu jeder beliebigen.
-Erst danach bauen.
+- die Seite wird nie breiter als der Bildschirm
 
 ### Anmeldung
 
@@ -448,8 +451,9 @@ unterscheiden. Alles, was im Extra-Feed landet, bekommt einen eigenen
 Farbton -- unabhängig davon, aus welchem Team es stammt, denn die Frage
 in diesem Bereich ist, in welchem Kalender es steht.
 
-Oben eine Kopfzeile mit der Anzahl je Feed, darunter eine Filterzeile nach
-Feed. Der Zeitraumfilter aus dem Kopfbereich gilt hier ebenfalls.
+Oben eine Reihe Chips, einer je Feed mit Farbpunkt und Anzahl, davor „Alle“
+mit der Summe. Jeder Chip zählt und filtert zugleich. Der Zeitraumfilter aus
+der Leiste gilt hier ebenfalls.
 
 Termine lassen sich auch von hier aus ausblenden, mit demselben Schalter wie
 überall. Ein ausgeblendeter Termin verschwindet aus diesem Bereich nicht,
@@ -464,8 +468,8 @@ gruppiert. Jede Zeile mit Schalter zum Ausblenden.
 **Andere Teams**
 
 Dieselbe Darstellung für die 1. Damen und die 2. Herren. Standardmäßig alles
-aus. Einschalten übernimmt den Termin in den Extra-Feed. Oben eine Filterzeile
-zum Eingrenzen auf ein Team.
+aus. Einschalten übernimmt den Termin in den Extra-Feed. Oben Chips zum
+Eingrenzen auf ein Team.
 
 **Gemerkte Spiele**
 
