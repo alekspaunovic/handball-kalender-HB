@@ -173,6 +173,20 @@ def test_unknown_included_uid_is_skipped_with_a_warning(config, caplog):
     assert "tbw-a-jugend-spiel-999999" in caplog.text
 
 
+def test_watched_match_also_in_included_appears_only_once(config):
+    gemerkt = {
+        "uid": "tbw-watch-spiel-563599",
+        "summary": "TV Aldekerk II - SG Langenfeld",
+    }
+
+    entries = extra.build_entries(
+        Overrides(included={gemerkt["uid"]}, watch={"563599"}),
+        {"watch-spiele": [gemerkt]}, config.halls, config.timezone,
+    )
+
+    assert [entry["uid"] for entry in entries] == ["tbw-watch-spiel-563599"]
+
+
 def test_extra_feed_is_written_even_when_empty(config, tmp_path):
     path = tmp_path / "extra.ics"
     ics_io.write_feed(path, [], config.extra_calname, config.timezone, config.feed_ttl)

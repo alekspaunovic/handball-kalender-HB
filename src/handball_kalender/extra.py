@@ -116,4 +116,13 @@ def build_entries(
     # wird ueber `hidden`, nicht durch Entfernen.
     entries.extend(archives.get(watch_feed_key, []))
 
-    return entries
+    # Jede UID nur einmal. Doppelt kaeme sie, wenn ein gemerktes Spiel
+    # zusaetzlich in `included` steht -- die Oberflaeche hat das frueher
+    # zugelassen, und solche Eintraege koennen noch in overrides.json stehen.
+    seen: set[str] = set()
+    unique = []
+    for entry in entries:
+        if entry["uid"] not in seen:
+            seen.add(entry["uid"])
+            unique.append(entry)
+    return unique
