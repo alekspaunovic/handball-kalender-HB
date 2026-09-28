@@ -1,33 +1,33 @@
 {
-  "generated": "2026-09-28T13:40:13.576569+00:00",
+  "generated": "2026-09-28T14:30:00.452824+00:00",
   "teams": [
     {
       "key": "m1",
       "name": "1. Herren",
       "own_team": true,
-      "color": "#0f7b8a",
-      "color_dark": "#4fb3c0"
+      "color": "#30b0c7",
+      "color_dark": "#40c8e0"
     },
     {
       "key": "1-damen",
       "name": "1. Damen",
       "own_team": false,
-      "color": "#b83280",
-      "color_dark": "#e069ab"
+      "color": "#ff2d55",
+      "color_dark": "#ff375f"
     },
     {
       "key": "2-herren",
       "name": "2. Herren",
       "own_team": false,
-      "color": "#2b6cb0",
-      "color_dark": "#6ba3e0"
+      "color": "#007aff",
+      "color_dark": "#0a84ff"
     },
     {
       "key": "watch",
       "name": "Gemerktes Spiel",
       "own_team": false,
-      "color": "#5a6270",
-      "color_dark": "#9aa3b0"
+      "color": "#8e8e93",
+      "color_dark": "#98989d"
     }
   ],
   "feeds": [
@@ -48,8 +48,8 @@
       "team_key": null,
       "name": "Extra",
       "short_name": "Extra",
-      "color": "#5a6270",
-      "color_dark": "#9aa3b0"
+      "color": "#8e8e93",
+      "color_dark": "#98989d"
     }
   ],
   "halls": [
