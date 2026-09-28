@@ -617,6 +617,9 @@ Für die gemerkten Spiele:
   trotzdem, der Archiveintrag der fehlgeschlagenen bleibt unverändert
 - Spiel ohne Anwurfzeit wird Ganztagestermin mit `Uhrzeit noch offen`
 - gemerkte Spiele stehen im Pool mit `team_key: "watch"` und `own_team: false`
+- steht die UID eines gemerkten Spiels zusätzlich in `included`, kommt es
+  trotzdem nur einmal in den Extra-Feed; unter „Andere Teams“ erscheinen
+  gemerkte Spiele gar nicht
 
 Für die Eingabe in der Oberfläche:
 

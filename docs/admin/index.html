@@ -378,6 +378,12 @@ button {
 
 .zeile__text { min-width: 0; }
 
+/* Beides sind span-Elemente (in einem button ist kein div erlaubt) und
+   brauchen deshalb ausdrücklich eine eigene Zeile -- sonst läuft der Ort
+   direkt hinter dem Titel weiter. */
+.zeile__titel,
+.zeile__ort { display: block; }
+
 .zeile__titel {
   font-size: 1rem;
   font-weight: 500;
@@ -1507,11 +1513,12 @@ function meineTermine() {
 /* --- Bereich: Andere Teams -------------------------------------------- */
 
 function andereTeams() {
-  const alle = termine(false);
-  // Reihenfolge wie in config.yaml. Gemerkte Spiele haben ihren eigenen
-  // Bereich und deshalb hier keinen Filter.
+  // Gemerkte Spiele stehen im Pool ebenfalls als fremd, haben aber ihren
+  // eigenen Bereich. Hier angeschaltet, landeten sie in `included` und damit
+  // ein zweites Mal im Extra-Feed.
+  const alle = termine(false).filter((e) => e.team_key !== "watch");
+  // Reihenfolge wie in config.yaml.
   const teams = zustand.pool.teams
-    .filter((team) => team.key !== "watch")
     .map((team) => alle.find((e) => e.team_key === team.key))
     .filter(Boolean)
     .map((e) => ({ key: e.team_key, name: e.team }));
