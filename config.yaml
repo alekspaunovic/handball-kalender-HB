@@ -20,8 +20,8 @@ extra_calname: TBW Extra
 # Farbe steht fuer "liegt im Extra-Feed", egal aus welchem Team der Termin
 # stammt.
 extra_anzeigename: Extra
-extra_farbe: "#5a6270"
-extra_farbe_dunkel: "#9aa3b0"
+extra_farbe: "#8e8e93"
+extra_farbe_dunkel: "#98989d"
 
 # SpielerPlus-URLs kommen ausschliesslich aus Umgebungsvariablen (GitHub
 # Secrets bzw. lokale .env), niemals aus dieser Datei. Hier steht nur, unter
@@ -32,14 +32,14 @@ extra_farbe_dunkel: "#9aa3b0"
 #
 # kurzname, farbe und farbe_dunkel braucht nur die Admin-Oberflaeche; sie
 # bekommt sie ueber docs/pool.json. farbe gilt im hellen, farbe_dunkel im
-# dunklen Modus. Die Farben haben gleiche Helligkeit und Saettigung, damit
-# keine laut wird.
+# dunklen Modus. Es sind die Systemfarben von iOS und macOS (Tuerkis, Pink,
+# Blau, Grau) in ihrer hellen und dunklen Fassung.
 teams:
   m1:
     anzeigename: "1. Herren"
     kurzname: "M1"
-    farbe: "#0f7b8a"
-    farbe_dunkel: "#4fb3c0"
+    farbe: "#30b0c7"
+    farbe_dunkel: "#40c8e0"
     handballnet_name: "TB Wülfrath"
     handballnet_team_id: 75787
     spielerplus_env: SPIELERPLUS_M1
@@ -58,15 +58,15 @@ teams:
   # Das Kuerzel steckt dauerhaft in der UID und darf sich nie aendern.
   "1-damen":
     anzeigename: "1. Damen"
-    farbe: "#b83280"
-    farbe_dunkel: "#e069ab"
+    farbe: "#ff2d55"
+    farbe_dunkel: "#ff375f"
     handballnet_team_id: 76182
     spieldauer_minuten: 90
     own: false
   "2-herren":
     anzeigename: "2. Herren"
-    farbe: "#2b6cb0"
-    farbe_dunkel: "#6ba3e0"
+    farbe: "#007aff"
+    farbe_dunkel: "#0a84ff"
     handballnet_team_id: 74503
     spieldauer_minuten: 90
     own: false
@@ -78,8 +78,8 @@ teams:
   # behandeln koennen.
   watch:
     anzeigename: "Gemerktes Spiel"
-    farbe: "#5a6270"
-    farbe_dunkel: "#9aa3b0"
+    farbe: "#8e8e93"
+    farbe_dunkel: "#98989d"
     spieldauer_minuten: 90
     own: false
 
