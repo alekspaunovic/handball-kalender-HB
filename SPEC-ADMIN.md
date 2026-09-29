@@ -34,6 +34,7 @@ liegt. Kein Server, keine Datenbank.
 | `overrides.json` | Sperrliste, eigene Termine, freigeschaltete Fremdspiele, gemerkte Spiele | die App |
 | `docs/pool.json` | alle bekannten Termine als Auswahlgrundlage | der Workflow |
 | `docs/admin/index.html` | die Oberfläche | einmalig beim Bau |
+| `darstellung.json` | Aussehen der Oberfläche (Abschnitt 6, Darstellung) | die App |
 
 ### overrides.json
 
@@ -89,8 +90,8 @@ Skript gesehen hat, auch die der Fremdteams:
       "key": "m1",
       "name": "1. Herren",
       "own_team": true,
-      "color": "#0f7b8a",
-      "color_dark": "#4fb3c0"
+      "color": "#30b0c7",
+      "color_dark": "#40c8e0"
     }
   ],
   "feeds": [
@@ -332,22 +333,24 @@ Leitgedanken:
 
 - Die Bausteine von iOS und macOS statt eigener Erfindungen: großer Titel,
   durchscheinende Leisten, Reiterleiste mit Symbolen, gruppierte Listen mit
-  abgerundeten Ecken, Schalter, Chips, Formulare aus beschrifteten Zeilen.
+  abgerundeten Ecken, Häkchen, Chips, Formulare aus beschrifteten Zeilen.
 - Farben und Maße nach den Human Interface Guidelines: Systemfarben für
-  Hintergrund, Flächen, Text und Trennlinien, Blau als Akzent für
-  Bedienelemente, Grün für eingeschaltete Schalter, Rot für Absagen, Fehler
-  und Löschen.
+  Hintergrund, Flächen, Text und Trennlinien.
+- Bedienelemente standardmäßig in Schwarz, im Dunkelmodus in Weiß; in der
+  Darstellung umstellbar auf Blau. Rot nur für Absagen, Fehler und Löschen.
 - Ein Blick soll reichen, um Spiel von Training und eigenes Team von fremdem
   Team zu unterscheiden. Dafür ist die farbige Leiste links in der Zeile
   zuständig, wie im Kalender von Apple, nicht ein Etikett im Text.
 - Der Zustand ist das Wichtigste auf dem Bildschirm. Ein ausgeblendeter Termin
   muss durchgestrichen und deutlich zurückgenommen wirken, ein
   freigeschalteter Fremdtermin sichtbar aktiv.
-- Der Schalter bedeutet in jedem Bereich dasselbe: liegt das in meinem
-  Kalender? Ein Denkmodell für alle vier Listen, egal ob technisch `hidden`,
-  `included` oder `watch` dahintersteht.
-- Bunt sind nur die Teamfarben (die Systemfarben von iOS, aus `config.yaml`)
-  und der Akzent. Alles andere ist ruhig.
+- Die Anzeige am Zeilenende (standardmäßig ein Häkchen) bedeutet in jedem
+  Bereich dasselbe: das liegt in meinem Kalender. Ein Denkmodell für alle
+  vier Listen, egal ob technisch `hidden`, `included` oder `watch`
+  dahintersteht.
+- Farbig sind nur die Teamfarben. `config.yaml` enthält die vollen
+  Grundfarben; wie kräftig sie erscheinen, regelt die Farbstärke in der
+  Darstellung (Standard 55 Prozent). Alles andere ist Schwarz, Weiß und Grau.
 
 Bewusst nicht erwünscht: Verlaufsflächen als Dekoration, Schatten auf jeder
 Fläche, Einblendanimationen bei jedem Abschnitt, eigene Bedienelemente, wo
@@ -357,8 +360,8 @@ das System schon eines hat.
 
 **iPhone:**
 
-- oben eine schmale Leiste mit dem Zeitraum rechts. Darunter steht der große
-  Titel des Bereichs. Beim Scrollen wird die Leiste durchscheinend und zeigt
+- oben eine schmale Leiste mit dem Zahnrad für die Darstellung links und dem
+  Zeitraum rechts. Darunter steht der große Titel des Bereichs. Beim Scrollen wird die Leiste durchscheinend und zeigt
   den Titel klein in der Mitte.
 - unten die Reiterleiste mit Symbol und kurzer Beschriftung: `Übersicht`,
   `Meine`, `Andere`, `Gemerkt`, `Neu`
@@ -368,25 +371,27 @@ das System schon eines hat.
 
 **Mac (ab 768 Punkt Breite):**
 
-- links eine Seitenleiste mit den fünf Bereichen und ihren vollen Namen
+- links eine Seitenleiste mit den fünf Bereichen und ihren vollen Namen,
+  ganz unten die Darstellung
 - oben eine Werkzeugleiste mit Titel, Zeitraum und Speichern-Knopf
-- Schrift, Zeilen und Schalter in den etwas kleineren macOS-Größen
+- Schrift und Zeilen in den etwas kleineren macOS-Größen
 
 Die Übersicht ist die Startansicht.
 
-Die Liste ist nach Datum gruppiert, jeder Tag eine abgerundete Gruppe. Das
-Datum steht als Überschrift darüber, der heutige Tag in Rot. Eine
-Terminzeile enthält:
+Die Liste ist nach Datum gruppiert, standardmäßig jeder Tag eine abgerundete
+Gruppe. Das Datum steht als Überschrift darüber, grau, der heutige Tag
+hervorgehoben. Eine Terminzeile enthält:
 
 ```
-▌ 19:00   Training 1. Herren                     (  ●)
+▌ 19:00   Training 1. Herren                        ✓
 ▌ 20:30   Sporthalle Fliethe
 ```
 
 Die farbige Leiste links trägt die Teamfarbe und ist bei Spielen kräftiger
 als bei Trainings. Beginn und darunter Ende stehen in einer eigenen Spalte,
-damit die Zeiten untereinander eine lesbare Kante bilden. Der Schalter sitzt
-rechts, getroffen wird die ganze Zeile.
+damit die Zeiten untereinander eine lesbare Kante bilden. Rechts steht die
+Anzeige für an und aus, standardmäßig ein Häkchen, wenn der Termin im
+Kalender liegt, sonst nichts. Getroffen wird die ganze Zeile.
 
 Ausgeblendete Termine: Text durchgestrichen und grau, Leiste grau. Sie
 bleiben an ihrer Stelle in der Liste stehen. Nicht freigeschaltete Spiele
@@ -408,7 +413,7 @@ Entschuldigungen, keine Fehlercodes ohne Erklärung.
 
 ### Bewegung
 
-Nur als Antwort auf eine Handlung: der Schalter gleitet um, ein Termin wird
+Nur als Antwort auf eine Handlung: das Häkchen blendet ein, ein Termin wird
 durchgestrichen, die Leiste wird beim Scrollen durchscheinend. Sonst nichts.
 `prefers-reduced-motion` wird respektiert.
 
@@ -436,6 +441,48 @@ Ein Knopf "Schlüssel entfernen" löscht ihn aus dem Browser.
 Antwortet GitHub mit 401 oder 403, erklärt die App, dass der Schlüssel
 abgelaufen oder ungültig ist, und fragt erneut danach.
 
+### Darstellung
+
+Alles zum Aussehen lässt sich in der Oberfläche selbst einstellen, über das
+Zahnrad oben links (iPhone) oder „Darstellung“ unten in der Seitenleiste
+(Mac). Jede Änderung gilt sofort, eine Vorschau mit echten Terminen zeigt sie
+an Ort und Stelle.
+
+| Einstellung | Werte | Standard |
+| --- | --- | --- |
+| Farbstärke | 0 bis 100 Prozent: wie viel der Grundfarbe gegen Grau | 55 |
+| Teamfarben | eigene Farbe je Team und für den Extra-Feed, sonst die aus `config.yaml` | keine eigenen |
+| Knöpfe | Schwarz/Weiß oder Blau | Schwarz/Weiß |
+| An und aus | Häkchen, Kreis, Schalter, Auge | Häkchen |
+| Aufbau der Liste | Gruppen, Liste (ohne Karten), Agenda (Datum als Spalte), Kompakt (eine Zeile) | Gruppen |
+| Erscheinungsbild | Automatisch, Hell, Dunkel | Automatisch |
+
+Gespeichert wird in `darstellung.json` im Repository, damit iPhone und Mac
+gleich aussehen. In diesem Repository steht dort anfangs die Optik, mit der
+es gestartet ist: Knöpfe Blau, Schalter, Farbstärke 100:
+
+```json
+{
+  "version": 1,
+  "farbstaerke": 55,
+  "akzent": "schwarzweiss",
+  "anzeige": "haken",
+  "aufbau": "gruppen",
+  "modus": "auto",
+  "teamfarben": {"m2": "#5856d6"}
+}
+```
+
+- geschrieben wird kurz nach der letzten Änderung und beim Verlassen des
+  Bereichs, ohne Workflow-Lauf -- die Feeds hängen nicht davon ab
+- zusätzlich liegt eine Kopie im Browser, damit schon Anmeldung und
+  Ladezustand richtig aussehen
+- hat ein anderes Gerät inzwischen gespeichert, gewinnt die letzte Änderung
+- unbekannte oder kaputte Werte fallen auf den Standard zurück, keiner geht
+  ungeprüft in Stile oder Attribute
+- eine eigene Teamfarbe ist eine Farbe; für den Dunkelmodus wird sie etwas
+  aufgehellt
+
 ### Die fünf Bereiche
 
 **Übersicht**
@@ -455,15 +502,15 @@ Oben eine Reihe Chips, einer je Feed mit Farbpunkt und Anzahl, davor „Alle“
 mit der Summe. Jeder Chip zählt und filtert zugleich. Der Zeitraumfilter aus
 der Leiste gilt hier ebenfalls.
 
-Termine lassen sich auch von hier aus ausblenden, mit demselben Schalter wie
-überall. Ein ausgeblendeter Termin verschwindet aus diesem Bereich nicht,
-sondern bleibt durchgestrichen an seiner Stelle -- sonst wäre der Schalter
-nicht umkehrbar.
+Termine lassen sich auch von hier aus ausblenden, mit einem Tipp auf die
+Zeile wie überall. Ein ausgeblendeter Termin verschwindet aus diesem Bereich
+nicht, sondern bleibt durchgestrichen an seiner Stelle -- sonst wäre das
+Ausblenden nicht umkehrbar.
 
 **Meine Termine**
 
 Alle Termine der eigenen Teams aus `pool.json`, chronologisch, nach Datum
-gruppiert. Jede Zeile mit Schalter zum Ausblenden.
+gruppiert. Ein Tipp auf die Zeile blendet sie aus oder wieder ein.
 
 **Andere Teams**
 
@@ -504,7 +551,7 @@ Schreibweise bekommt. Die Vorschau dient dem Erkennen des richtigen Spiels,
 nicht der Typografie -- und die Namensregeln in JavaScript nachzubauen hieße,
 sie zweimal zu pflegen.
 
-Darunter die Liste der gemerkten Spiele mit Schaltern. Ausgeschaltete bleiben
+Darunter die Liste der gemerkten Spiele mit Häkchen. Ausgeschaltete bleiben
 durchgestrichen an ihrer Stelle stehen. Ganz entfernen ist nicht vorgesehen.
 
 Ein gerade bestätigtes Spiel steht noch in keinem Archiv. Bis zum nächsten
@@ -552,6 +599,8 @@ soll. Das kann passieren, wenn die App auf zwei Geräten offen ist.
 - der Lauf schreibt zusätzlich `docs/pool.json` und `docs/extra.ics`
 - der Lauf schreibt zusätzlich `data/watch-spiele.json`
 - `overrides.json` wird gelesen, aber vom Workflow nie verändert
+- `darstellung.json` braucht der Workflow gar nicht, sie gehört allein der
+  Oberfläche
 - schlägt das Lesen von `overrides.json` fehl, läuft der Rest trotzdem durch
 - `fetch-depth: 0` beim Checkout, weil der Commit-Schritt ein `git pull
   --rebase` macht: die App schreibt `overrides.json`, während der Lauf läuft,
