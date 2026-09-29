@@ -32,8 +32,9 @@ extra_farbe_dunkel: "#98989d"
 #
 # kurzname, farbe und farbe_dunkel braucht nur die Admin-Oberflaeche; sie
 # bekommt sie ueber docs/pool.json. farbe gilt im hellen, farbe_dunkel im
-# dunklen Modus. Es sind die Systemfarben von iOS und macOS (Tuerkis, Pink,
-# Blau, Grau) in ihrer hellen und dunklen Fassung.
+# dunklen Modus. Es sind die vollen Grundfarben (die Systemfarben von iOS:
+# Tuerkis, Pink, Blau, Grau); wie kraeftig sie in der Oberflaeche erscheinen,
+# stellt man dort unter Darstellung -> Farbstaerke ein (darstellung.json).
 teams:
   m1:
     anzeigename: "1. Herren"

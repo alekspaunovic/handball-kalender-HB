@@ -14,12 +14,23 @@
    Gestaltung nach dem Vorbild der Apple-Apps: auf dem iPhone wie eine
    iOS-App (großer Titel, durchscheinende Leisten, Reiterleiste mit Symbolen,
    gruppierte Listen, Schalter), am Mac wie eine macOS-App (Seitenleiste,
-   Werkzeugleiste, etwas kleinere Schrift und Schalter). Farben sind die
+   Werkzeugleiste, etwas kleinere Schrift). Flächen, Text und Linien in den
    Systemfarben von iOS und macOS, die Schrift ist die Systemschrift
-   (SF Pro auf Apple-Geräten). Bunt sind nur die Teamfarben aus config.yaml
-   und der Akzent für Bedienelemente.
+   (SF Pro auf Apple-Geräten).
+
+   Das Aussehen lässt sich im Bereich „Darstellung“ einstellen: Farbstärke
+   und einzelne Teamfarben, Knöpfe in Schwarz/Weiß oder Blau, die Anzeige
+   für an/aus (Häkchen, Kreis, Schalter, Auge), der Aufbau der Liste
+   (Gruppen, Liste, Agenda, Kompakt) und hell/dunkel. Die Einstellungen
+   liegen in darstellung.json im Repository und gelten auf allen Geräten.
+   Rot bleibt für Absagen, Fehler und Löschen.
 --------------------------------------------------------------------------- */
 
+/* Farbtoken. Hell steht auf :root, dunkel greift nach Systemeinstellung
+   oder erzwungen über data-modus (Einstellung „Erscheinungsbild“). Die
+   Akzentfarbe ist in eine helle und eine dunkle Fassung geteilt
+   (--akzent-l/-d), damit die Einstellung „Knöpfe“ sie über data-akzent
+   tauschen kann, ohne die Dunkel-Blöcke zu kennen. */
 :root {
   --grund: #f2f2f7;
   --flaeche: #ffffff;
@@ -30,9 +41,7 @@
   --fuellung: rgba(118, 118, 128, 0.12);
   --gedrueckt: #d1d1d6;
   --schwebe: rgba(0, 0, 0, 0.03);
-  --akzent: #007aff;
   --rot: #ff3b30;
-  --gruen: #34c759;
   --schalter-aus: #e9e9eb;
   --reiter-aus: #8e8e93;
   --leiste: rgba(249, 249, 249, 0.94);
@@ -40,9 +49,31 @@
   --auswahl: rgba(0, 0, 0, 0.08);
   --fehler: var(--rot);
 
+  /* Knöpfe „Schwarz/Weiß“: Schwarz im Hellen, Weiß im Dunklen. */
+  --akzent-l: #1c1c1e;
+  --akzent-d: #f2f2f7;
+  --auf-akzent-l: #ffffff;
+  --auf-akzent-d: #000000;
+  --an-l: #1c1c1e;
+  --an-d: #d1d1d6;
+  --knopf-l: #ffffff;
+  --knopf-d: #1c1c1e;
+  --heute-l: #000000;
+  --heute-d: #ffffff;
+  --auf-heute-l: #ffffff;
+  --auf-heute-d: #000000;
+
+  --akzent: var(--akzent-l);
+  --auf-akzent: var(--auf-akzent-l);
+  --an: var(--an-l);
+  --knopf: var(--knopf-l);
+  --heute: var(--heute-l);
+  --auf-heute: var(--auf-heute-l);
+
   /* Teamfarben: --team-<kürzel> je Team und --feed-extra für den Extra-Feed.
-     Sie stehen nicht hier, sondern in config.yaml, und kommen über pool.json
-     in den Stilblock #teamfarben (farbenSetzen). --feed-extra gilt nur in der
+     Die Grundfarben stehen in config.yaml und kommen über pool.json; die
+     Einstellung „Farbstärke“ mischt sie mit Grau. farbenSetzen() schreibt
+     das Ergebnis in den Stilblock #teamfarben. --feed-extra gilt nur in der
      Übersicht: dort fragt die Linie "in welchem Kalender", nicht "welches
      Team". */
 
@@ -67,8 +98,22 @@
   --rechts: env(safe-area-inset-right, 0px);
 }
 
+/* Knöpfe „Blau“: der iOS-Akzent, grüne Schalter, der heutige Tag in Rot. */
+:root[data-akzent="blau"] {
+  --akzent-l: #007aff;
+  --akzent-d: #0a84ff;
+  --auf-akzent-l: #ffffff;
+  --auf-akzent-d: #ffffff;
+  --an-l: #34c759;
+  --an-d: #30d158;
+  --knopf-d: #ffffff;
+  --heute-l: #ff3b30;
+  --heute-d: #ff453a;
+  --auf-heute-d: #ffffff;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-modus="hell"]) {
     --grund: #000000;
     --flaeche: #1c1c1e;
     --tinte: #ffffff;
@@ -78,16 +123,48 @@
     --fuellung: rgba(118, 118, 128, 0.24);
     --gedrueckt: #2c2c2e;
     --schwebe: rgba(255, 255, 255, 0.04);
-    --akzent: #0a84ff;
     --rot: #ff453a;
-    --gruen: #30d158;
     --schalter-aus: #39393d;
     --reiter-aus: #98989d;
     --leiste: rgba(22, 22, 23, 0.92);
     --seitenleiste: #1c1c1e;
     --auswahl: rgba(255, 255, 255, 0.1);
+    --akzent: var(--akzent-d);
+    --auf-akzent: var(--auf-akzent-d);
+    --an: var(--an-d);
+    --knopf: var(--knopf-d);
+    --heute: var(--heute-d);
+    --auf-heute: var(--auf-heute-d);
+    color-scheme: dark;
   }
 }
+
+:root[data-modus="dunkel"] {
+  --grund: #000000;
+  --flaeche: #1c1c1e;
+  --tinte: #ffffff;
+  --tinte-2: rgba(235, 235, 245, 0.6);
+  --tinte-3: rgba(235, 235, 245, 0.3);
+  --linie: rgba(84, 84, 88, 0.65);
+  --fuellung: rgba(118, 118, 128, 0.24);
+  --gedrueckt: #2c2c2e;
+  --schwebe: rgba(255, 255, 255, 0.04);
+  --rot: #ff453a;
+  --schalter-aus: #39393d;
+  --reiter-aus: #98989d;
+  --leiste: rgba(22, 22, 23, 0.92);
+  --seitenleiste: #1c1c1e;
+  --auswahl: rgba(255, 255, 255, 0.1);
+  --akzent: var(--akzent-d);
+  --auf-akzent: var(--auf-akzent-d);
+  --an: var(--an-d);
+  --knopf: var(--knopf-d);
+  --heute: var(--heute-d);
+  --auf-heute: var(--auf-heute-d);
+  color-scheme: dark;
+}
+
+:root[data-modus="hell"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
 
@@ -222,7 +299,7 @@ button {
   padding: 0 20px;
   border-radius: 14px;
   background: var(--akzent);
-  color: #fff;
+  color: var(--auf-akzent);
   font-size: 17px;
   font-weight: 600;
   white-space: nowrap;
@@ -269,6 +346,7 @@ button {
   min-height: 44px;
   color: var(--akzent);
   font-size: var(--text);
+  font-weight: 600;
 }
 
 .textknopf--rot { color: var(--rot); }
@@ -384,9 +462,9 @@ body.hat-aenderungen .haupt {
   font-variant-numeric: tabular-nums;
 }
 
-.chip[aria-pressed="true"] { background: var(--akzent); color: #fff; }
-.chip[aria-pressed="true"] .chip__zahl { color: rgba(255, 255, 255, 0.8); }
-.chip[aria-pressed="true"] .chip__punkt { box-shadow: 0 0 0 1.5px #fff; opacity: 1; }
+.chip[aria-pressed="true"] { background: var(--akzent); color: var(--auf-akzent); }
+.chip[aria-pressed="true"] .chip__zahl { color: inherit; opacity: 0.75; }
+.chip[aria-pressed="true"] .chip__punkt { box-shadow: 0 0 0 1.5px var(--auf-akzent); opacity: 1; }
 
 .chip-kurz { display: inline; }
 .chip-lang { display: none; }
@@ -404,8 +482,11 @@ body.hat-aenderungen .haupt {
   color: var(--tinte-2);
 }
 
-/* Wie im Kalender von Apple: der heutige Tag in Rot. */
-.datum--heute { color: var(--rot); }
+/* Der heutige Tag hervorgehoben: in Schriftfarbe bei Schwarz/Weiß, in Rot
+   bei Blau (wie im Kalender von Apple). */
+.datum--heute { color: var(--heute); }
+
+.datum__wt, .datum__nr { display: none; }
 
 .liste {
   list-style: none;
@@ -531,8 +612,46 @@ button.zeile:focus-visible { outline-offset: -3px; border-radius: 0; }
 
 .zeile__abgesagt { color: var(--rot); font-weight: 600; }
 
-/* Der Schalter von iOS. Er ist die Anzeige, getroffen wird die ganze
-   Zeile. Grün heißt: liegt im Kalender. */
+/* Das Häkchen am Zeilenende, wie in den Einstellungen von iOS: da heißt
+   „liegt im Kalender“, fehlt heißt „nicht im Kalender“. Es ist die Anzeige,
+   getroffen wird die ganze Zeile. */
+.haken {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--akzent);
+}
+
+.haken svg { width: 18px; height: 18px; opacity: 0; transition: opacity 150ms ease; }
+[data-an="true"] > .haken svg { opacity: 1; }
+
+/* Kreis mit Haken, wie in der Erinnerungen-App. */
+.kreis {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--tinte-3);
+  color: var(--auf-akzent);
+  transition: background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.kreis svg { width: 13px; height: 13px; opacity: 0; transition: opacity 150ms ease; }
+[data-an="true"] > .kreis { background: var(--akzent); box-shadow: none; }
+[data-an="true"] > .kreis svg { opacity: 1; }
+
+/* Auge: offen heißt sichtbar, durchgestrichen heißt ausgeblendet. */
+.auge { display: grid; place-items: center; width: 28px; height: 24px; color: var(--tinte-2); }
+.auge svg { width: 24px; height: 24px; }
+.auge .auge--zu { display: none; }
+[data-an="false"] > .auge { color: var(--tinte-3); }
+[data-an="false"] > .auge .auge--offen { display: none; }
+[data-an="false"] > .auge .auge--zu { display: block; }
+
+/* Der Schalter von iOS: im Formular („Ganztägig“) und als Anzeige-Variante
+   in den Terminzeilen. */
 .schalter-knopf {
   position: relative;
   flex: none;
@@ -552,22 +671,22 @@ button.zeile:focus-visible { outline-offset: -3px; border-radius: 0; }
   width: calc(var(--schalter-h) - 4px);
   height: calc(var(--schalter-h) - 4px);
   border-radius: 50%;
-  background: #fff;
+  background: var(--knopf);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
   transition: transform 200ms ease;
 }
 
-[data-an="true"] > .schalter-knopf,
-[aria-pressed="true"] > .schalter-knopf { background: var(--gruen); }
+[aria-pressed="true"] > .schalter-knopf,
+[data-an="true"] > .schalter-knopf { background: var(--an); }
 
-[data-an="true"] > .schalter-knopf::after,
-[aria-pressed="true"] > .schalter-knopf::after {
+[aria-pressed="true"] > .schalter-knopf::after,
+[data-an="true"] > .schalter-knopf::after {
   transform: translateX(calc(var(--schalter-b) - var(--schalter-h)));
 }
 
 @media (prefers-reduced-motion: reduce) {
   .zeile, .zeile::before, .zeile__titel,
-  .schalter-knopf, .schalter-knopf::after,
+  .schalter-knopf, .schalter-knopf::after, .haken svg, .kreis, .kreis svg,
   .leiste::before, .leiste__titel { transition: none; }
 }
 
@@ -583,7 +702,6 @@ button.zeile:focus-visible { outline-offset: -3px; border-radius: 0; }
 .platzhalter .balken--titel { width: 62%; }
 .platzhalter .balken--ort { width: 40%; margin-top: 8px; }
 .platzhalter .zeile__zeit .balken { width: 2.5rem; }
-.platzhalter .schalter-knopf { opacity: 0.5; }
 
 /* --- Hinweise und Fehler ------------------------------------------------ */
 
@@ -785,7 +903,7 @@ button.feld:active { background: var(--gedrueckt); }
   padding: 0 14px;
   border-radius: 16px;
   background: var(--akzent);
-  color: #fff;
+  color: var(--auf-akzent);
   font-size: var(--text-klein);
   font-weight: 600;
 }
@@ -818,7 +936,11 @@ button.feld:active { background: var(--gedrueckt); }
 /* --- Abstände zwischen den Blöcken eines Bereichs ------------------------ */
 
 .merken + .gruppe,
-.vorschau + .gruppe { margin-top: 32px; }
+.merken + .tage,
+.vorschau + .gruppe,
+.vorschau + .tage { margin-top: 32px; }
+
+.gruppe + .tage { margin-top: 24px; }
 
 .eigene { margin-top: 36px; }
 
@@ -830,6 +952,195 @@ button.feld:active { background: var(--gedrueckt); }
 /* --- Fußnote: Schlüssel entfernen ---------------------------------------- */
 
 .abschnitt.fuss { margin-top: 44px; }
+
+/* --- Aufbau der Liste: Liste, Agenda, Kompakt ---------------------------
+   „Gruppen“ ist der Grundaufbau oben. Die anderen setzen auf
+   data-aufbau am Wurzelelement auf.                                    --- */
+
+/* Liste: durchgehend ohne Karten, die Tage als Zwischenzeilen, die beim
+   Scrollen unter der Leiste stehen bleiben. */
+:root[data-aufbau="liste"] .gruppe { margin: 0; }
+:root[data-aufbau="liste"] .gruppe + .gruppe { margin-top: 0; }
+:root[data-aufbau="liste"] .datum {
+  position: sticky;
+  top: calc(var(--leiste-hoehe) + var(--oben));
+  z-index: 5;
+  margin: 0;
+  padding: 7px calc(var(--rand) + 16px);
+  background: var(--grund);
+  border-bottom: 0.5px solid var(--linie);
+}
+:root[data-aufbau="liste"] .liste { border-radius: 0; }
+:root[data-aufbau="liste"] .zeile { padding-left: calc(var(--rand) + 30px); }
+:root[data-aufbau="liste"] .zeile::before { left: calc(var(--rand) + 16px); }
+:root[data-aufbau="liste"] .liste > li + li::before { left: calc(var(--rand) + 30px); }
+
+/* Agenda: eine Fläche, das Datum groß in einer eigenen Spalte links. */
+:root[data-aufbau="agenda"] .tage {
+  margin: 0 var(--rand);
+  background: var(--flaeche);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+:root[data-aufbau="agenda"] .tage > .gruppe {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  margin: 0;
+  padding: 6px 0;
+}
+:root[data-aufbau="agenda"] .tage > .gruppe + .gruppe { margin-top: 0; border-top: 0.5px solid var(--linie); }
+:root[data-aufbau="agenda"] .tage .datum {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 1px;
+  margin: 0;
+  padding: 12px 0 0 14px;
+}
+:root[data-aufbau="agenda"] .tage .datum__lang { display: none; }
+:root[data-aufbau="agenda"] .tage .datum__wt {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+:root[data-aufbau="agenda"] .tage .datum__nr {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--tinte);
+  font-variant-numeric: tabular-nums;
+}
+:root[data-aufbau="agenda"] .tage .datum--heute .datum__nr { background: var(--heute); color: var(--auf-heute); }
+:root[data-aufbau="agenda"] .tage .liste { background: none; border-radius: 0; }
+:root[data-aufbau="agenda"] .tage .liste > li + li::before { left: 22px; }
+:root[data-aufbau="agenda"] .tage .zeile { padding-left: 22px; grid-template-columns: 3.1rem minmax(0, 1fr) auto; }
+:root[data-aufbau="agenda"] .tage .zeile::before { left: 8px; }
+
+/* Kompakt: eine Zeile je Termin, der Ort klein daneben. */
+:root[data-aufbau="kompakt"] .zeile {
+  min-height: 46px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  grid-template-columns: 2.9rem minmax(0, 1fr) auto;
+}
+:root[data-aufbau="kompakt"] .zeile::before { top: 9px; bottom: 9px; }
+:root[data-aufbau="kompakt"] .zeile__ende { display: none; }
+:root[data-aufbau="kompakt"] .zeile__zeit { align-self: center; padding: 0; }
+:root[data-aufbau="kompakt"] .zeile__text { display: flex; gap: 6px; align-items: baseline; }
+:root[data-aufbau="kompakt"] .zeile__titel {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:root[data-aufbau="kompakt"] .zeile__ort { flex: 1 1 0; min-width: 2.5rem; }
+
+/* --- Bereich Darstellung --------------------------------------------------- */
+
+/* Zahnrad links in der Leiste, nur auf dem iPhone. Am Mac steht der Bereich
+   in der Seitenleiste. */
+.zahnrad {
+  position: absolute;
+  left: calc(var(--rand) + var(--links) - 8px);
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--akzent);
+}
+.zahnrad svg { position: relative; width: 24px; height: 24px; }
+/* Offen: ein weicher Kreis hinter dem Zahnrad. Nochmal tippen führt zurück. */
+.zahnrad::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  transition: background-color 150ms ease;
+}
+.zahnrad[aria-current="true"]::before { background: var(--fuellung); }
+
+.navigation .nur-mac { display: none; }
+
+.segmente {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--fuellung);
+}
+
+.segmente button {
+  min-height: 32px;
+  padding: 0 4px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.segmente button[aria-pressed="true"] {
+  background: var(--flaeche);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+:root[data-modus="dunkel"] .segmente button[aria-pressed="true"] { background: #636366; box-shadow: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-modus="hell"]) .segmente button[aria-pressed="true"] { background: #636366; box-shadow: none; }
+}
+
+.einstellung { display: grid; gap: 10px; padding: 12px 16px; position: relative; }
+.einstellung + .einstellung::before,
+.einstellung + .feld::before,
+.feld + .einstellung::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  border-top: 0.5px solid var(--linie);
+}
+.einstellung__kopf { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.einstellung__wert { color: var(--tinte-2); font-variant-numeric: tabular-nums; }
+
+.regler { width: 100%; accent-color: var(--akzent); margin: 4px 0; }
+
+.farbstreifen { display: flex; gap: 6px; }
+.farbstreifen i { flex: 1; height: 8px; border-radius: 4px; background: var(--farbe); }
+
+/* Farbfeld als runder Knopf; das native Auswahlfenster öffnet beim Tippen. */
+.farbfeld {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.farbfeld::-webkit-color-swatch-wrapper { padding: 0; }
+.farbfeld::-webkit-color-swatch { border: 0; border-radius: 50%; }
+.farbfeld::-moz-color-swatch { border: 0; border-radius: 50%; }
+
+.feld__name { flex: 1; min-width: 0; }
+.feld .textknopf { font-size: var(--text-klein); min-height: 36px; }
+
+.vorschau-liste .zeile { cursor: pointer; }
+
+.darstellung-status { min-height: 1.4em; }
 
 /* --- Mac und iPad: Seitenleiste und Werkzeugleiste ----------------------- */
 
@@ -893,6 +1204,8 @@ button.feld:active { background: var(--gedrueckt); }
   }
 
   .navigation svg { width: 19px; height: 19px; color: var(--akzent); }
+  .navigation .nur-mac { display: flex; margin-top: auto; }
+  .zahnrad { display: none; }
 
   .navigation button:hover { background: var(--schwebe); }
   .navigation button[aria-current="true"] { background: var(--auswahl); color: var(--tinte); font-weight: 500; }
@@ -941,6 +1254,11 @@ button.feld:active { background: var(--gedrueckt); }
   .speichern { min-height: 36px; border-radius: 8px; font-size: 14px; }
   .aktionen .speichern { flex: 0 0 auto; }
   .kapsel { min-height: 26px; border-radius: 13px; font-size: 13px; }
+  .haken svg { width: 16px; height: 16px; }
+  .kreis { width: 20px; height: 20px; }
+  .kreis svg { width: 11px; height: 11px; }
+  .auge svg { width: 21px; height: 21px; }
+  .segmente button { min-height: 26px; font-size: 13px; }
   .textknopf { min-height: 32px; }
 
   .grosstitel + * { margin-top: 0; }
@@ -975,10 +1293,17 @@ button.feld:active { background: var(--gedrueckt); }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M12 8v8M8 12h8"/></svg>
       <span class="nav-kurz">Neu</span><span class="nav-lang">Eigener Termin</span>
     </button>
+    <button type="button" class="nur-mac" data-bereich="darstellung" aria-current="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.4z"/></svg>
+      <span class="nav-kurz">Darstellung</span><span class="nav-lang">Darstellung</span>
+    </button>
   </nav>
 
   <div class="haupt">
     <header class="leiste" id="leiste">
+      <button type="button" class="zahnrad" id="zahnrad" aria-label="Darstellung" aria-current="false" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.6-2-3.4-2.4 1a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.5A7.6 7.6 0 0 0 7 6.5l-2.4-1-2 3.4 2 1.6a7.6 7.6 0 0 0 0 3l-2 1.6 2 3.4 2.4-1a7.6 7.6 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.6 7.6 0 0 0 2.6-1.5l2.4 1 2-3.4z"/></svg>
+      </button>
       <span class="leiste__titel" id="leiste-titel">Kalender verwalten</span>
 
       <label class="zeitraum" id="zeitraum-feld">
@@ -1036,6 +1361,14 @@ const SCHLUESSEL_ORT = "tbw-admin-token:" + location.origin + location.pathname;
 
 const zustand = {
   pool: null,
+  // Aussehen: kommt beim Start aus dem Browser, nach dem Anmelden aus
+  // darstellung.json.
+  darstellung: null,
+  darstellungSha: null,
+  darstellungStatus: "",
+  darstellungFehler: "",
+  vorherBereich: "uebersicht",
+  vorschauAus: new Set(),
   hidden: new Set(),
   included: new Set(),
   custom: [],
@@ -1087,6 +1420,7 @@ function h(tag, attrs, ...kinder) {
 }
 
 const WOCHENTAGE = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+const WOCHENTAGE_KURZ = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
 const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
                 "August", "September", "Oktober", "November", "Dezember"];
 
@@ -1373,23 +1707,248 @@ async function poolLaden() {
 const KUERZEL_MUSTER = /^[a-z0-9_-]+$/i;
 const FARB_MUSTER = /^#[0-9a-f]{3,8}$/i;
 
+/* --- Darstellung ----------------------------------------------------------
+   Einstellungen zum Aussehen (SPEC-ADMIN.md Abschnitt 6, „Darstellung“).
+   Sie liegen in darstellung.json im Repository, damit iPhone und Mac gleich
+   aussehen, und zusätzlich im Browser, damit die Seite schon vor dem Laden
+   richtig aussieht. Jeder Wert wird geprüft, bevor er in ein Attribut oder
+   in den Stilblock geht.                                               --- */
+
+const DARSTELLUNG_PFAD = "darstellung.json";
+const DARSTELLUNG_ORT = "tbw-darstellung:" + location.origin + location.pathname;
+
+const DARSTELLUNG_STANDARD = {
+  version: 1,
+  farbstaerke: 55,
+  akzent: "schwarzweiss",
+  anzeige: "haken",
+  aufbau: "gruppen",
+  modus: "auto",
+  teamfarben: {},
+};
+
+const DARSTELLUNG_WAHL = {
+  akzent: ["schwarzweiss", "blau"],
+  anzeige: ["haken", "kreis", "schalter", "auge"],
+  aufbau: ["gruppen", "liste", "agenda", "kompakt"],
+  modus: ["auto", "hell", "dunkel"],
+};
+
+const DARSTELLUNG_NAMEN = {
+  akzent: { schwarzweiss: "Schwarz/Weiß", blau: "Blau" },
+  anzeige: { haken: "Häkchen", kreis: "Kreis", schalter: "Schalter", auge: "Auge" },
+  aufbau: { gruppen: "Gruppen", liste: "Liste", agenda: "Agenda", kompakt: "Kompakt" },
+  modus: { auto: "Automatisch", hell: "Hell", dunkel: "Dunkel" },
+};
+
+const DARSTELLUNG_TEXTE = {
+  akzent: {
+    schwarzweiss: "Knöpfe und Auswahl in Schwarz, im Dunkelmodus in Weiß.",
+    blau: "Knöpfe und Auswahl in Blau wie bei iOS, Schalter grün, der heutige Tag rot.",
+  },
+  anzeige: {
+    haken: "Ein Haken, wenn der Termin im Kalender liegt, sonst nichts.",
+    kreis: "Ein Kreis, der sich mit einem Haken füllt, wie in der Erinnerungen-App.",
+    schalter: "Der Schalter von iOS.",
+    auge: "Offenes Auge für sichtbar, durchgestrichenes für ausgeblendet.",
+  },
+  aufbau: {
+    gruppen: "Jeder Tag eine abgerundete Gruppe.",
+    liste: "Durchgehende Liste, die Tage als Zwischenzeilen, die beim Scrollen oben stehen bleiben.",
+    agenda: "Das Datum groß in einer eigenen Spalte links, wie in einem Taschenkalender.",
+    kompakt: "Eine Zeile je Termin, der Ort klein daneben. Mehr auf einen Blick.",
+  },
+  modus: {
+    auto: "Folgt der Einstellung des Geräts.",
+    hell: "Immer hell.",
+    dunkel: "Immer dunkel.",
+  },
+};
+
+/** Übernimmt nur bekannte Werte, alles andere fällt auf den Standard. */
+function darstellungPruefen(roh) {
+  const d = { ...DARSTELLUNG_STANDARD, teamfarben: {} };
+  if (!roh || typeof roh !== "object") return d;
+  const staerke = Number(roh.farbstaerke);
+  if (roh.farbstaerke !== undefined && Number.isFinite(staerke)) {
+    d.farbstaerke = Math.min(100, Math.max(0, Math.round(staerke)));
+  }
+  for (const [feld, werte] of Object.entries(DARSTELLUNG_WAHL)) {
+    if (werte.includes(roh[feld])) d[feld] = roh[feld];
+  }
+  if (roh.teamfarben && typeof roh.teamfarben === "object") {
+    for (const [kuerzel, farbe] of Object.entries(roh.teamfarben)) {
+      if (KUERZEL_MUSTER.test(kuerzel) && /^#[0-9a-f]{6}$/i.test(farbe)) {
+        d.teamfarben[kuerzel] = farbe.toLowerCase();
+      }
+    }
+  }
+  return d;
+}
+
+function darstellungAusBrowser() {
+  try {
+    return darstellungPruefen(JSON.parse(localStorage.getItem(DARSTELLUNG_ORT) || "null"));
+  } catch {
+    return darstellungPruefen(null);
+  }
+}
+
+function darstellungImBrowserMerken() {
+  try { localStorage.setItem(DARSTELLUNG_ORT, JSON.stringify(zustand.darstellung)); } catch { /* nur Bequemlichkeit */ }
+}
+
+/** Setzt Knöpfe, Modus und Aufbau als Attribute und die Teamfarben neu. */
+function darstellungAnwenden() {
+  const d = zustand.darstellung;
+  const wurzel = document.documentElement;
+  wurzel.dataset.akzent = d.akzent;
+  wurzel.dataset.anzeige = d.anzeige;
+  wurzel.dataset.aufbau = d.aufbau;
+  if (d.modus === "auto") delete wurzel.dataset.modus;
+  else wurzel.dataset.modus = d.modus;
+  if (zustand.pool) farbenSetzen(zustand.pool);
+}
+
+/* Farben rechnen: die Grundfarbe aus config.yaml (oder die eigene aus der
+   Darstellung) wird mit Grau gemischt. Farbstärke 100 ist die volle
+   Grundfarbe, 0 ist Grau. */
+
+const GRAU_HELL = "#8e8e93";
+const GRAU_DUNKEL = "#98989d";
+
+function hexNormal(hex) {
+  if (!FARB_MUSTER.test(hex || "")) return null;
+  let ziffern = hex.slice(1);
+  if (ziffern.length === 3 || ziffern.length === 4) ziffern = ziffern.slice(0, 3).replace(/./g, "$&$&");
+  return "#" + ziffern.slice(0, 6).toLowerCase();
+}
+
+function mischen(a, b, anteilA) {
+  const x = parseInt(a.slice(1), 16);
+  const y = parseInt(b.slice(1), 16);
+  return "#" + [16, 8, 0].map((verschiebung) => {
+    const wert = ((x >> verschiebung) & 255) * anteilA + ((y >> verschiebung) & 255) * (1 - anteilA);
+    return Math.round(wert).toString(16).padStart(2, "0");
+  }).join("");
+}
+
+/** Grundfarbe eines Teams oder Feeds, ohne Farbstärke. */
+function grundfarbe(quelle, kuerzel, dunkel) {
+  const eigen = zustand.darstellung.teamfarben[kuerzel];
+  // Eine eigene Farbe gibt es nur einmal; im Dunkeln wird sie etwas heller.
+  if (eigen) return dunkel ? mischen(eigen, "#ffffff", 0.82) : eigen;
+  return hexNormal(dunkel ? quelle.color_dark : quelle.color);
+}
+
 function farbenSetzen(pool) {
+  const staerke = zustand.darstellung.farbstaerke / 100;
   const hell = [];
   const dunkel = [];
-  function eintragen(token, quelle) {
-    if (FARB_MUSTER.test(quelle.color || "")) hell.push("  " + token + ": " + quelle.color + ";");
-    if (FARB_MUSTER.test(quelle.color_dark || "")) dunkel.push("    " + token + ": " + quelle.color_dark + ";");
+  function eintragen(token, quelle, kuerzel) {
+    const grundHell = grundfarbe(quelle, kuerzel, false);
+    const grundDunkel = grundfarbe(quelle, kuerzel, true) || grundHell;
+    if (grundHell) hell.push("  " + token + ": " + mischen(grundHell, GRAU_HELL, staerke) + ";");
+    if (grundDunkel) dunkel.push("  " + token + ": " + mischen(grundDunkel, GRAU_DUNKEL, staerke) + ";");
   }
   for (const team of pool.teams) {
-    if (KUERZEL_MUSTER.test(team.key)) eintragen("--team-" + team.key, team);
+    if (KUERZEL_MUSTER.test(team.key)) eintragen("--team-" + team.key, team, team.key);
   }
   // Nur Feeds ohne Team bringen eine eigene Farbe mit, also der Extra-Feed.
   for (const feed of pool.feeds) {
-    if (KUERZEL_MUSTER.test(feed.key)) eintragen("--feed-" + feed.key, feed);
+    if (KUERZEL_MUSTER.test(feed.key)) eintragen("--feed-" + feed.key, feed, feed.key);
   }
+  const dunkelBlock = dunkel.join("\n");
   el("teamfarben").textContent =
     ":root {\n" + hell.join("\n") + "\n}\n" +
-    "@media (prefers-color-scheme: dark) {\n  :root {\n" + dunkel.join("\n") + "\n  }\n}\n";
+    "@media (prefers-color-scheme: dark) {\n:root:not([data-modus=\"hell\"]) {\n" + dunkelBlock + "\n}\n}\n" +
+    ":root[data-modus=\"dunkel\"] {\n" + dunkelBlock + "\n}\n";
+}
+
+async function darstellungLaden() {
+  const antwort = await github(
+    repoPfad("/contents/" + DARSTELLUNG_PFAD + "?ref=" + BRANCH + "&t=" + Date.now())
+  );
+  if (!antwort) return { sha: null, daten: null };
+  let daten = null;
+  try {
+    daten = JSON.parse(ausBase64(antwort.content));
+  } catch {
+    // Kaputte Datei: Standard zeigen, das nächste Speichern repariert sie.
+  }
+  return { sha: antwort.sha, daten };
+}
+
+let darstellungUhr = null;
+
+/** Ändert die Darstellung, zeigt sie sofort und speichert kurz danach.
+ *  Beim Schieben des Reglers und beim Farbwählen wird nicht neu gezeichnet,
+ *  sonst risse der Bildneubau das Bedienelement unter dem Finger weg. */
+function darstellungAendern(arbeit, { neuZeichnen = true } = {}) {
+  arbeit(zustand.darstellung);
+  darstellungImBrowserMerken();
+  darstellungAnwenden();
+  zustand.darstellungStatus = "wartet";
+  if (neuZeichnen) zeichnen();
+  else darstellungStatusZeigen();
+  clearTimeout(darstellungUhr);
+  darstellungUhr = setTimeout(darstellungSpeichern, 1200);
+}
+
+async function darstellungSpeichern() {
+  clearTimeout(darstellungUhr);
+  darstellungUhr = null;
+  if (zustand.darstellungStatus !== "wartet" || !schluessel()) return;
+  zustand.darstellungStatus = "speichert";
+  darstellungStatusZeigen();
+
+  const text = JSON.stringify(zustand.darstellung, null, 2) + "\n";
+  const schreiben = (sha) => github(repoPfad("/contents/" + DARSTELLUNG_PFAD), {
+    method: "PUT",
+    body: JSON.stringify({
+      message: "Darstellung angepasst",
+      content: nachBase64(text),
+      branch: BRANCH,
+      ...(sha ? { sha } : {}),
+    }),
+  });
+
+  try {
+    let antwort;
+    try {
+      antwort = await schreiben(zustand.darstellungSha);
+    } catch (fehler) {
+      if (fehler instanceof SchluesselFehler || fehler instanceof NetzFehler) throw fehler;
+      // Inzwischen auf einem anderen Gerät gespeichert: die letzte Änderung
+      // gewinnt, bei Aussehen ist das die erwartete Regel.
+      const aktuell = await darstellungLaden();
+      antwort = await schreiben(aktuell.sha);
+    }
+    zustand.darstellungSha = antwort.content.sha;
+    if (zustand.darstellungStatus === "speichert") zustand.darstellungStatus = "gespeichert";
+  } catch (fehler) {
+    zustand.darstellungStatus = "fehler";
+    zustand.darstellungFehler = fehler.message;
+  }
+  darstellungStatusZeigen();
+}
+
+function darstellungStatusText() {
+  switch (zustand.darstellungStatus) {
+    case "wartet": return "Änderung wird gleich gespeichert …";
+    case "speichert": return "Wird gespeichert …";
+    case "gespeichert": return "Gespeichert. Gilt jetzt auf allen Geräten.";
+    case "fehler": return "Nicht gespeichert: " + zustand.darstellungFehler +
+      " Auf diesem Gerät gilt die Einstellung trotzdem.";
+    default: return "Änderungen gelten sofort und werden für alle Geräte gespeichert.";
+  }
+}
+
+function darstellungStatusZeigen() {
+  const zeile = el("darstellung-status");
+  if (!zeile) return;
+  zeile.textContent = darstellungStatusText();
+  zeile.classList.toggle("abschnitt__fuss--fehler", zustand.darstellungStatus === "fehler");
 }
 
 /** Das Farbtoken eines Feeds: die Teamfarbe, beim Extra-Feed seine eigene. */
@@ -1414,9 +1973,21 @@ async function allesLaden() {
   zeichnen();
 
   try {
-    const [pool, overrides] = await Promise.all([poolLaden(), overridesLaden()]);
+    const [pool, overrides, darstellung] = await Promise.all([
+      poolLaden(),
+      overridesLaden(),
+      // Ohne Darstellung geht es weiter, mit der aus dem Browser.
+      darstellungLaden().catch(() => null),
+    ]);
     zustand.pool = pool;
-    farbenSetzen(pool);
+    if (darstellung) {
+      zustand.darstellungSha = darstellung.sha;
+      if (darstellung.daten && zustand.darstellungStatus !== "wartet") {
+        zustand.darstellung = darstellungPruefen(darstellung.daten);
+        darstellungImBrowserMerken();
+      }
+    }
+    darstellungAnwenden();
     zustand.sha = overrides.sha;
     zustand.geladenRaw = overrides.roh;
     overridesUebernehmen(overrides.daten);
@@ -1463,6 +2034,7 @@ const TITEL = {
   andere: "Andere Teams",
   gemerkt: "Gemerkte Spiele",
   eigener: "Eigener Termin",
+  darstellung: "Darstellung",
 };
 
 /* Kurz genug für die Leiste auf dem iPhone, neben dem Titel. */
@@ -1479,8 +2051,11 @@ function zeichnen() {
 
   el("speichern").hidden = !sichern;
   el("speichern").disabled = zustand.speichert;
-  // Der Zeitraum gilt für alle vier Listenbereiche, nur nicht fürs Formular.
-  el("zeitraum-feld").hidden = !angemeldet || zustand.bereich === "eigener";
+  // Der Zeitraum gilt für alle vier Listenbereiche, nicht fürs Formular und
+  // nicht für die Darstellung.
+  el("zeitraum-feld").hidden = !angemeldet || zustand.bereich === "eigener" || zustand.bereich === "darstellung";
+  el("zahnrad").hidden = !angemeldet;
+  el("zahnrad").setAttribute("aria-current", String(zustand.bereich === "darstellung"));
   el("zeitraum-text").textContent = ZEITRAUM_KURZ[zustand.zeitraum];
   el("navigation").hidden = !angemeldet;
   document.body.classList.toggle("angemeldet", angemeldet);
@@ -1506,6 +2081,7 @@ function zeichnen() {
     andere: andereTeams,
     gemerkt: gemerkteSpiele,
     eigener: eigenerTermin,
+    darstellung: darstellungBereich,
   };
   inhalt.replaceChildren(grosstitel, (bereiche[zustand.bereich] || uebersicht)(), fussnote());
 }
@@ -1594,7 +2170,7 @@ function geruest() {
               h("span", { class: "balken balken--titel" }),
               h("span", { class: "balken balken--ort" })
             ),
-            h("span", { class: "schalter-knopf" })
+            h("span", { class: "haken" })
           )
         )
       )
@@ -1706,9 +2282,9 @@ function zeile(event, { an, fremd, umschalten, farbe, zusatz }) {
         ? h("span", { class: "zeile__ort", text: zusatz || kurzerOrt(event.location) })
         : null
     ),
-    // Ohne Umschalten kein Schalter: er wäre eine Anzeige für einen Zustand,
+    // Ohne Umschalten kein Häkchen: es wäre eine Anzeige für einen Zustand,
     // den hier niemand ändern kann.
-    umschalten ? h("span", { class: "schalter-knopf" }) : null,
+    umschalten ? anzeige() : null,
   ];
 
   // In der Übersicht trägt die Linie den Feed statt des Teams. Eigene Termine
@@ -1724,7 +2300,7 @@ function zeile(event, { an, fremd, umschalten, farbe, zusatz }) {
 
   if (!umschalten) return h("div", attrs, inneres);
 
-  // Die Schalter sagen in allen Bereichen dasselbe: liegt das im Kalender?
+  // Die Häkchen sagen in allen Bereichen dasselbe: liegt das im Kalender?
   const beschriftung = fremd
     ? (an ? "In den Kalender geholt" : "Nicht im Kalender")
     : (an ? "Im Kalender" : "Ausgeblendet");
@@ -1759,6 +2335,28 @@ function chip({ gewaehlt, onclick, kurz, lang, zahl, farbe, training }) {
   );
 }
 
+const SYMBOL_HAKEN =
+  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.4l3 3 6-6.8"/></svg>';
+
+const SYMBOL_AUGE =
+  '<svg class="auge--offen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/>' +
+  '<circle cx="12" cy="12" r="3"/></svg>' +
+  '<svg class="auge--zu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+  'stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6.5 9.5-6.5c1.8 0 3.4.6 4.7 1.4M21.5 12s-3.5 6.5-9.5 6.5c-1.8 0-3.4-.6-4.7-1.4"/>' +
+  '<path d="M9.9 14.1a3 3 0 0 1 4.2-4.2M4 20L20 4"/></svg>';
+
+/** Die Anzeige am Zeilenende, je nach Einstellung Häkchen, Kreis, Schalter
+ *  oder Auge. Ob an oder aus, entscheidet das CSS über data-an der Zeile. */
+function anzeige() {
+  const art = zustand.darstellung.anzeige;
+  if (art === "schalter") return h("span", { class: "schalter-knopf", "aria-hidden": "true" });
+  const knoten = h("span", { class: art === "kreis" || art === "auge" ? art : "haken", "aria-hidden": "true" });
+  knoten.innerHTML = art === "auge" ? SYMBOL_AUGE : SYMBOL_HAKEN;
+  return knoten;
+}
+
 function gruppiert(liste, zeileBauen) {
   const gruppen = new Map();
   for (const event of liste) {
@@ -1767,12 +2365,20 @@ function gruppiert(liste, zeileBauen) {
     gruppen.get(tag).push(event);
   }
   const heute = new Date().toLocaleDateString("sv-SE");
-  return Array.from(gruppen, ([tag, events]) =>
-    h("section", { class: "gruppe" },
-      h("h2", { class: tag === heute ? "datum datum--heute" : "datum", text: datumUeberschrift(tag) }),
+  // Lang für Gruppen und Liste, Wochentag und Zahl für die Agenda; welche
+  // Fassung sichtbar ist, entscheidet das CSS.
+  return h("div", { class: "tage" }, Array.from(gruppen, ([tag, events]) => {
+    const [jahr, monat, tagZahl] = tag.split("-").map(Number);
+    const wochentag = new Date(Date.UTC(jahr, monat - 1, tagZahl)).getUTCDay();
+    return h("section", { class: "gruppe" },
+      h("h2", { class: tag === heute ? "datum datum--heute" : "datum" },
+        h("span", { class: "datum__lang", text: datumUeberschrift(tag) }),
+        h("span", { class: "datum__wt", "aria-hidden": "true", text: WOCHENTAGE_KURZ[wochentag] }),
+        h("span", { class: "datum__nr", "aria-hidden": "true", text: String(tagZahl) })
+      ),
       h("ul", { class: "liste" }, events.map((e) => h("li", {}, zeileBauen(e))))
-    )
-  );
+    );
+  }));
 }
 
 function aendern(arbeit) {
@@ -2403,6 +3009,163 @@ function eigenerTermin() {
   );
 }
 
+/* --- Bereich: Darstellung -----------------------------------------------
+   Alles zum Aussehen an einem Ort. Jede Änderung gilt sofort und wird kurz
+   danach in darstellung.json gespeichert.                               --- */
+
+function darstellungWahl(feld, kopf) {
+  const d = zustand.darstellung;
+  return h("div", { class: "abschnitt" },
+    h("h2", { class: "abschnitt__kopf", text: kopf }),
+    h("div", { class: "formgruppe" },
+      h("div", { class: "einstellung" },
+        h("div", { class: "segmente", role: "group", "aria-label": kopf },
+          DARSTELLUNG_WAHL[feld].map((wert) =>
+            h("button", {
+              type: "button",
+              "aria-pressed": String(d[feld] === wert),
+              onclick: () => darstellungAendern((neu) => { neu[feld] = wert; }),
+            }, DARSTELLUNG_NAMEN[feld][wert])
+          )
+        )
+      )
+    ),
+    h("p", { class: "abschnitt__fuss", text: DARSTELLUNG_TEXTE[feld][d[feld]] })
+  );
+}
+
+/** Ein paar echte Termine ab heute, damit jede Einstellung sofort sichtbar
+ *  ist. An/aus schaltet hier nur die Vorschau, nicht den Kalender. */
+function darstellungVorschau() {
+  const liste = alleTermine().slice(0, 4);
+  if (!liste.length) return null;
+  return h("div", { class: "vorschau-liste" },
+    h("h2", { class: "abschnitt__kopf", style: "margin: 0 var(--rand) 7px", text: "Vorschau" }),
+    gruppiert(liste, (event) => {
+      const an = !zustand.vorschauAus.has(event.uid);
+      return zeile(event, {
+        an,
+        fremd: false,
+        farbe: farbeVon(event, feedVon(event)),
+        umschalten: () => {
+          if (an) zustand.vorschauAus.add(event.uid);
+          else zustand.vorschauAus.delete(event.uid);
+          zeichnen();
+        },
+      });
+    }),
+    h("p", { class: "abschnitt__fuss", style: "margin: 8px var(--rand) 0", text:
+      "Tipp auf eine Zeile, um zu sehen, wie „aus“ aussieht. Das ändert nichts am Kalender." })
+  );
+}
+
+function teamfarbenAbschnitt() {
+  const d = zustand.darstellung;
+  const pool = zustand.pool;
+  const eintraege = [
+    ...pool.teams
+      .filter((team) => KUERZEL_MUSTER.test(team.key))
+      .map((team) => ({ kuerzel: team.key, name: team.name, quelle: team, token: "--team-" + team.key })),
+    ...pool.feeds
+      .filter((feed) => !feed.team_key && KUERZEL_MUSTER.test(feed.key))
+      .map((feed) => ({ kuerzel: feed.key, name: "Kalender " + feed.name, quelle: feed, token: "--feed-" + feed.key })),
+  ];
+
+  const wert = h("span", { class: "einstellung__wert", text: d.farbstaerke + " %" });
+  const regler = h("input", {
+    type: "range",
+    id: "farbstaerke",
+    class: "regler",
+    min: "0",
+    max: "100",
+    step: "5",
+    value: String(d.farbstaerke),
+    "aria-label": "Farbstärke",
+    oninput: (ereignis) => {
+      const zahl = Number(ereignis.target.value);
+      wert.textContent = zahl + " %";
+      darstellungAendern((neu) => { neu.farbstaerke = zahl; }, { neuZeichnen: false });
+    },
+  });
+
+  return h("div", { class: "abschnitt" },
+    h("h2", { class: "abschnitt__kopf", text: "Teamfarben" }),
+    h("div", { class: "formgruppe" },
+      h("div", { class: "einstellung" },
+        h("div", { class: "einstellung__kopf" }, h("label", { for: "farbstaerke", text: "Farbstärke" }), wert),
+        regler,
+        h("div", { class: "farbstreifen", "aria-hidden": "true" },
+          eintraege.map((eintrag) => h("i", { style: "--farbe: var(" + eintrag.token + ")" }))
+        )
+      ),
+      eintraege.map((eintrag) => {
+        const eigen = d.teamfarben[eintrag.kuerzel];
+        return h("div", { class: "feld" },
+          h("input", {
+            type: "color",
+            class: "farbfeld",
+            id: "farbe-" + eintrag.kuerzel,
+            value: eigen || hexNormal(eintrag.quelle.color) || GRAU_HELL,
+            oninput: (ereignis) => darstellungAendern((neu) => {
+              neu.teamfarben[eintrag.kuerzel] = ereignis.target.value.toLowerCase();
+            }, { neuZeichnen: false }),
+            onchange: () => zeichnen(),
+          }),
+          h("label", { class: "feld__name", for: "farbe-" + eintrag.kuerzel, text: eintrag.name }),
+          eigen
+            ? h("button", {
+                class: "textknopf",
+                type: "button",
+                onclick: () => darstellungAendern((neu) => { delete neu.teamfarben[eintrag.kuerzel]; }),
+              }, "Zurücksetzen")
+            : null
+        );
+      })
+    ),
+    h("p", { class: "abschnitt__fuss", text:
+      "Links wenig, rechts viel Farbe. Tippe auf einen Farbkreis, um die Farbe eines Teams zu ändern; " +
+      "der Kreis zeigt die volle Farbe, die Liste sie mit der eingestellten Stärke. " +
+      "„Zurücksetzen“ holt die Farbe aus config.yaml zurück." })
+  );
+}
+
+function darstellungBereich() {
+  return h("div", { class: "darstellung" },
+    darstellungVorschau(),
+    h("div", { style: "height: 28px" }),
+    teamfarbenAbschnitt(),
+    darstellungWahl("akzent", "Knöpfe"),
+    darstellungWahl("anzeige", "An und aus in der Liste"),
+    darstellungWahl("aufbau", "Aufbau der Liste"),
+    darstellungWahl("modus", "Erscheinungsbild"),
+    h("div", { class: "abschnitt" },
+      h("div", { class: "formgruppe" },
+        h("button", {
+          class: "feld feld--knopf",
+          type: "button",
+          onclick: () => darstellungAendern((neu) => {
+            Object.assign(neu, { ...DARSTELLUNG_STANDARD, teamfarben: {} });
+          }),
+        }, "Alles auf Standard zurücksetzen")
+      ),
+      h("p", { class: "abschnitt__fuss darstellung-status", id: "darstellung-status", text: darstellungStatusText() })
+    )
+  );
+}
+
+/** Zum Bereich Darstellung und wieder zurück, über das Zahnrad. */
+function darstellungUmschalten() {
+  if (zustand.bereich === "darstellung") {
+    zustand.bereich = zustand.vorherBereich || "uebersicht";
+    darstellungSpeichern();
+  } else {
+    zustand.vorherBereich = zustand.bereich;
+    zustand.bereich = "darstellung";
+  }
+  zeichnen();
+  window.scrollTo({ top: 0 });
+}
+
 /* --- Fussnote ---------------------------------------------------------- */
 
 function fussnote() {
@@ -2536,11 +3299,19 @@ el("zeitraum").addEventListener("change", (ereignis) => {
 
 for (const knopf of el("navigation").querySelectorAll("button")) {
   knopf.addEventListener("click", () => {
+    // Offene Darstellungs-Änderung gleich sichern, nicht erst nach der Pause.
+    if (zustand.bereich === "darstellung") darstellungSpeichern();
     zustand.bereich = knopf.dataset.bereich;
     zeichnen();
     window.scrollTo({ top: 0 });
   });
 }
+
+el("zahnrad").addEventListener("click", darstellungUmschalten);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) darstellungSpeichern();
+});
 
 window.addEventListener("scroll", leisteAnpassen, { passive: true });
 
@@ -2549,6 +3320,11 @@ window.addEventListener("beforeunload", (ereignis) => {
   ereignis.preventDefault();
   ereignis.returnValue = "";
 });
+
+// Aussehen zuerst aus dem Browser, damit schon Anmeldung und Ladegerüst
+// stimmen. Nach dem Anmelden kommt es aus darstellung.json.
+zustand.darstellung = darstellungAusBrowser();
+darstellungAnwenden();
 
 if (schluessel()) allesLaden();
 else { zustand.laedt = false; zeichnen(); }
