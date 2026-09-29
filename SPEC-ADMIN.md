@@ -368,6 +368,9 @@ das System schon eines hat.
 - der Speichern-Knopf erscheint nur, wenn es etwas zu speichern gibt, und
   schwebt dann über der Reiterleiste, wo der Daumen ist. Nichts in der Leiste
   darf breiter werden als der Bildschirm.
+- nach gut einer Bildschirmhöhe Scrollen erscheint unten rechts ein runder
+  Knopf mit Pfeil nach oben, der an den Anfang der Seite zurückbringt; am Mac
+  ebenso in der unteren rechten Ecke
 
 **Mac (ab 768 Punkt Breite):**
 
@@ -498,9 +501,21 @@ unterscheiden. Alles, was im Extra-Feed landet, bekommt einen eigenen
 Farbton -- unabhängig davon, aus welchem Team es stammt, denn die Frage
 in diesem Bereich ist, in welchem Kalender es steht.
 
-Oben eine Reihe Chips, einer je Feed mit Farbpunkt und Anzahl, davor „Alle“
-mit der Summe. Jeder Chip zählt und filtert zugleich. Der Zeitraumfilter aus
-der Leiste gilt hier ebenfalls.
+Oben ein Filter als einklappbare Karte. Zugeklappt zeigt sie in einer Zeile,
+was gerade gefiltert ist, und wie viele Termine davon im Kalender stehen
+(`Alle Teams · 130`, `1. Herren · Training · 106`). Aufgeklappt stehen
+darunter:
+
+1. Mannschaft: Chips mit Farbpunkt und Anzahl, davor „Alle“. Alles aus dem
+   Extra-Feed ist eine eigene Gruppe „Extra“.
+2. Art: Alle, Training oder Spiele.
+
+Die beiden Filter wirken zusammen, die Anzahlen an den Mannschaften folgen der
+gewählten Art. Ob die Karte offen ist, merkt sich der Browser. Der
+Zeitraumfilter aus der Leiste gilt hier ebenfalls.
+
+Chipreihen, die seitlich scrollen, behalten ihre Position, wenn ein Termin
+angetippt wird.
 
 Termine lassen sich auch von hier aus ausblenden, mit einem Tipp auf die
 Zeile wie überall. Ein ausgeblendeter Termin verschwindet aus diesem Bereich
@@ -570,8 +585,15 @@ Löschen.
 ### Zeitraum
 
 Standardmäßig nur Termine ab heute. Im Auswahlfeld zusätzlich: Letzte 30 Tage,
-Letzte 12 Monate, Alle. Die Auswahl gilt für alle Listenbereiche, also
-Übersicht, Meine Termine, Andere Teams und Gemerkte Spiele.
+Letzte 12 Monate, Alle und „Datum oder Zeitraum …“. Die Auswahl gilt für
+alle Listenbereiche, also Übersicht, Meine Termine, Andere Teams und Gemerkte
+Spiele.
+
+„Datum oder Zeitraum …“ zeigt unter dem Titel die Felder Von und Bis, beide
+Tage eingeschlossen; vorgeschlagen ist die kommende Woche. Für einen
+einzelnen Tag stehen beide auf demselben Datum. Liegt ein Ende vor dem
+Anfang, zieht es das andere mit. In der Leiste steht dann der Zeitraum kurz
+(`03.10.–11.10.`), ein Knopf „Ab heute“ führt zurück.
 
 ### Speichern
 

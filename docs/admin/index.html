@@ -469,6 +469,112 @@ body.hat-aenderungen .haupt {
 .chip-kurz { display: inline; }
 .chip-lang { display: none; }
 
+/* --- Filter der Übersicht: einklappbare Karte ---------------------------- */
+
+.filterkarte {
+  margin: 2px var(--rand) 20px;
+  background: var(--flaeche);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.filter-kopf {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 16px;
+  text-align: left;
+}
+
+.filter-kopf:active { background: var(--gedrueckt); }
+.filter-kopf__name { font-size: var(--text); }
+.filter-kopf__wert {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  font-size: var(--text-klein);
+  color: var(--tinte-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.filter-kopf__wert--aktiv { color: var(--tinte); font-weight: 600; }
+.filter-kopf__pfeil { width: 13px; height: 13px; flex: none; color: var(--tinte-3); transition: transform 180ms ease; }
+.filter-kopf[aria-expanded="true"] .filter-kopf__pfeil { transform: rotate(180deg); }
+
+.filter-inhalt {
+  position: relative;
+  padding: 10px 0 14px;
+}
+
+.filter-inhalt::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 0;
+  border-top: 0.5px solid var(--linie);
+}
+
+.filter-titel {
+  padding: 0 16px 7px;
+  font-size: var(--text-klein);
+  font-weight: 600;
+  color: var(--tinte-2);
+}
+
+.filterkarte .chips { padding: 0 16px 14px; }
+.filter-segmente { padding: 0 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-kopf__pfeil { transition: none; }
+}
+
+/* --- Eigener Zeitraum: Von und Bis unter dem Titel ------------------------- */
+
+/* Doppelte Klasse: .abschnitt setzt später den Außenabstand zurück. */
+.abschnitt.zeitraum-auswahl { margin-bottom: 20px; }
+.zeitraum-auswahl__fuss {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+}
+.zeitraum-auswahl__fuss .textknopf { flex: none; white-space: nowrap; font-size: var(--text-klein); min-height: 36px; }
+
+/* --- Nach oben ---------------------------------------------------------------
+   Runder Knopf unten rechts, sobald die Liste länger gescrollt ist. Auf dem
+   iPhone über der Reiterleiste, bei ungespeicherten Änderungen über dem
+   Speichern-Knopf.                                                          --- */
+
+.nach-oben {
+  position: fixed;
+  z-index: 24;
+  right: calc(var(--rand) + var(--rechts));
+  bottom: calc(var(--reiter-hoehe) + var(--unten) + 16px);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--flaeche);
+  color: var(--akzent);
+  box-shadow: inset 0 0 0 1.5px var(--akzent), 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.nach-oben svg { width: 20px; height: 20px; }
+.nach-oben:active { transform: scale(0.94); }
+body.hat-aenderungen .nach-oben { bottom: calc(var(--reiter-hoehe) + var(--unten) + 78px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .nach-oben { transition: none; }
+}
+
 /* --- Gruppierte Liste: ein Tag, eine Gruppe ----------------------------- */
 
 .gruppe { margin: 0 calc(var(--rand)); }
@@ -1205,6 +1311,9 @@ button.feld:active { background: var(--gedrueckt); }
 
   .navigation svg { width: 19px; height: 19px; color: var(--akzent); }
   .navigation .nur-mac { display: flex; margin-top: auto; }
+  .filter-segmente .segmente { max-width: 22rem; }
+  .nach-oben,
+  body.hat-aenderungen .nach-oben { right: calc(28px + var(--rechts)); bottom: calc(28px + var(--unten)); width: 40px; height: 40px; }
   .zahnrad { display: none; }
 
   .navigation button:hover { background: var(--schwebe); }
@@ -1314,6 +1423,7 @@ button.feld:active { background: var(--gedrueckt); }
           <option value="30-tage">Letzte 30 Tage</option>
           <option value="12-monate">Letzte 12 Monate</option>
           <option value="alle">Alle</option>
+          <option value="datum">Datum oder Zeitraum …</option>
         </select>
       </label>
 
@@ -1327,6 +1437,10 @@ button.feld:active { background: var(--gedrueckt); }
     <main class="inhalt" id="inhalt"></main>
   </div>
 </div>
+
+<button type="button" class="nach-oben" id="nach-oben" aria-label="Nach oben" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5"/></svg>
+</button>
 
 <script>
 "use strict";
@@ -1380,8 +1494,14 @@ const zustand = {
   // die App meistens geöffnet wird.
   bereich: "uebersicht",
   zeitraum: "ab-heute",
+  // Eigener Zeitraum („Datum oder Zeitraum …“), beide Enden eingeschlossen.
+  von: null,
+  bis: null,
   teamFilter: "alle",
-  feedFilter: "alle",
+  // Filter der Übersicht: erst die Mannschaft, dann Training oder Spiele.
+  uebersichtTeam: "alle",
+  uebersichtArt: "alle",
+  filterOffen: filterOffenAusBrowser(),
   bearbeitet: null,
   laedt: true,
   ladefehler: null,
@@ -2056,7 +2176,7 @@ function zeichnen() {
   el("zeitraum-feld").hidden = !angemeldet || zustand.bereich === "eigener" || zustand.bereich === "darstellung";
   el("zahnrad").hidden = !angemeldet;
   el("zahnrad").setAttribute("aria-current", String(zustand.bereich === "darstellung"));
-  el("zeitraum-text").textContent = ZEITRAUM_KURZ[zustand.zeitraum];
+  el("zeitraum-text").textContent = zeitraumText();
   el("navigation").hidden = !angemeldet;
   document.body.classList.toggle("angemeldet", angemeldet);
   document.body.classList.toggle("hat-aenderungen", sichern);
@@ -2083,12 +2203,28 @@ function zeichnen() {
     eigener: eigenerTermin,
     darstellung: darstellungBereich,
   };
-  inhalt.replaceChildren(grosstitel, (bereiche[zustand.bereich] || uebersicht)(), fussnote());
+  const listenbereich = zustand.bereich !== "eigener" && zustand.bereich !== "darstellung";
+  // Die Chipreihen scrollen seitlich. Beim Neuzeichnen, etwa nach dem
+  // Antippen eines Termins, sollen sie nicht wieder nach links springen.
+  const seitlich = new Map(
+    [...inhalt.querySelectorAll("[data-scroll]")].map((reihe) => [reihe.dataset.scroll, reihe.scrollLeft])
+  );
+  inhalt.replaceChildren(...[
+    grosstitel,
+    listenbereich ? zeitraumAuswahl() : null,
+    (bereiche[zustand.bereich] || uebersicht)(),
+    fussnote(),
+  ].filter(Boolean));
+  for (const reihe of inhalt.querySelectorAll("[data-scroll]")) {
+    if (seitlich.has(reihe.dataset.scroll)) reihe.scrollLeft = seitlich.get(reihe.dataset.scroll);
+  }
 }
 
-/** Leiste durchscheinend und mit kleinem Titel, sobald gescrollt ist. */
+/** Leiste durchscheinend und mit kleinem Titel, sobald gescrollt ist; der
+ *  Knopf „Nach oben“ erscheint nach gut einer Bildschirmhöhe. */
 function leisteAnpassen() {
   el("leiste").classList.toggle("leiste--kompakt", window.scrollY > 28);
+  el("nach-oben").hidden = !schluessel() || window.scrollY < Math.max(600, window.innerHeight);
 }
 
 /* --- Anmeldung ---------------------------------------------------------- */
@@ -2202,11 +2338,80 @@ function grenzeVon(zeitraum) {
   return grenze.toLocaleDateString("sv-SE");
 }
 
+/** Untere und obere Grenze als Tagesschlüssel, beide eingeschlossen. */
+function zeitraumGrenzen() {
+  if (zustand.zeitraum === "datum") return [zustand.von, zustand.bis];
+  return [grenzeVon(zustand.zeitraum), "9999-12-31"];
+}
+
+function imZeitraum(event) {
+  const [von, bis] = zeitraumGrenzen();
+  const tag = tagVon(event.dtstart);
+  return tag >= von && tag <= bis;
+}
+
+function tagPlus(tag, tage) {
+  const d = new Date(tag + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + tage);
+  return d.toISOString().slice(0, 10);
+}
+
+/** „12.10.“ -- kurz genug für die Leiste auf dem iPhone. */
+function kurzesDatum(tag) {
+  const [, monat, tagZahl] = tag.split("-");
+  return tagZahl + "." + monat + ".";
+}
+
+function zeitraumText() {
+  if (zustand.zeitraum !== "datum") return ZEITRAUM_KURZ[zustand.zeitraum];
+  return zustand.von === zustand.bis
+    ? kurzesDatum(zustand.von)
+    : kurzesDatum(zustand.von) + "–" + kurzesDatum(zustand.bis);
+}
+
+/** Von und Bis unter dem Titel, solange ein eigener Zeitraum gewählt ist. */
+function zeitraumAuswahl() {
+  if (zustand.zeitraum !== "datum") return null;
+  function setzen(feld, wert) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(wert)) return;
+    zustand[feld] = wert;
+    // Ein Ende vor dem Anfang zieht das andere Ende mit.
+    if (zustand.bis < zustand.von) {
+      if (feld === "von") zustand.bis = zustand.von;
+      else zustand.von = zustand.bis;
+    }
+    zeichnen();
+  }
+  const datumsfeld = (feld, beschriftung) =>
+    h("div", { class: "feld" },
+      h("label", { for: "zeitraum-" + feld, text: beschriftung }),
+      h("input", {
+        type: "date",
+        id: "zeitraum-" + feld,
+        value: zustand[feld],
+        onchange: (ereignis) => setzen(feld, ereignis.target.value),
+      })
+    );
+  return h("div", { class: "abschnitt zeitraum-auswahl" },
+    h("div", { class: "formgruppe" },
+      datumsfeld("von", "Von"),
+      datumsfeld("bis", "Bis")
+    ),
+    h("div", { class: "abschnitt__fuss zeitraum-auswahl__fuss" },
+      h("span", { text: "Für einen einzelnen Tag beides gleich setzen." }),
+      h("button", {
+        class: "textknopf",
+        type: "button",
+        onclick: () => { zustand.zeitraum = "ab-heute"; el("zeitraum").value = "ab-heute"; zeichnen(); },
+      }, "Ab heute")
+    )
+  );
+}
+
 function termine(eigene) {
   if (!zustand.pool) return [];
-  const grenze = grenzeVon(zustand.zeitraum);
   return zustand.pool.events
-    .filter((e) => e.own_team === eigene && tagVon(e.dtstart) >= grenze)
+    .filter((e) => e.own_team === eigene && imZeitraum(e))
     .sort((a, b) => String(a.dtstart).localeCompare(String(b.dtstart)));
 }
 
@@ -2247,9 +2452,8 @@ function eigeneAlsPoolEintraege() {
 /** Alle Termine, die in einem Kalender stehen könnten -- Pool plus eigene. */
 function alleTermine() {
   if (!zustand.pool) return [];
-  const grenze = grenzeVon(zustand.zeitraum);
   return [...zustand.pool.events, ...eigeneAlsPoolEintraege()]
-    .filter((e) => tagVon(e.dtstart) >= grenze)
+    .filter(imZeitraum)
     .filter((e) => feedVon(e) !== null)
     .sort((a, b) => String(a.dtstart).localeCompare(String(b.dtstart)));
 }
@@ -2415,53 +2619,118 @@ function istAn(event) {
   return !zustand.hidden.has(event.uid);
 }
 
-function uebersicht() {
-  const liste = alleTermine();
+/** Die Mannschaft eines Termins in der Übersicht. Alles aus dem Extra-Feed
+ *  zählt als eigene Gruppe „Extra“, egal aus welchem Team es stammt. */
+function uebersichtTeamVon(event) {
+  return feedVon(event) === "extra" ? "extra" : event.team_key;
+}
 
-  // Gezählt wird, was wirklich im Kalender landet -- Ausgeblendetes nicht.
-  const anzahl = {};
-  for (const event of liste) {
-    if (zustand.hidden.has(event.uid)) continue;
-    const feed = feedVon(event);
-    anzahl[feed] = (anzahl[feed] || 0) + 1;
-  }
-  // Reihenfolge wie in config.yaml, der Extra-Feed zuletzt (pool.json).
-  const feeds = zustand.pool.feeds.filter((feed) => anzahl[feed.key]);
-  const summe = Object.values(anzahl).reduce((a, b) => a + b, 0);
-  const istTraining = (feed) =>
-    liste.some((e) => feedVon(e) === feed.key && e.type === "training");
+function filterOffenAusBrowser() {
+  try { return localStorage.getItem("tbw-filter-offen") === "ja"; } catch { return false; }
+}
 
-  // Anzahl je Feed und Filter in einem: jeder Chip zählt und filtert.
-  const filter = h("div", { class: "chips", role: "group", "aria-label": "Kalender" },
-    chip({
-      gewaehlt: zustand.feedFilter === "alle",
-      onclick: () => { zustand.feedFilter = "alle"; zeichnen(); },
-      kurz: "Alle",
-      lang: "Alle Kalender",
-      zahl: summe,
-    }),
-    feeds.map((feed) =>
-      chip({
-        gewaehlt: zustand.feedFilter === feed.key,
-        onclick: () => { zustand.feedFilter = feed.key; zeichnen(); },
-        kurz: feed.short_name || feed.key,
-        lang: feed.name || feed.key,
-        zahl: anzahl[feed.key],
-        farbe: feedFarbe(feed),
-        training: istTraining(feed),
-      })
+function filterOffenMerken() {
+  try { localStorage.setItem("tbw-filter-offen", zustand.filterOffen ? "ja" : "nein"); } catch { /* nur Bequemlichkeit */ }
+}
+
+const ART_NAMEN = { alle: "Alle", training: "Training", spiele: "Spiele" };
+
+/** Der Filter der Übersicht als einklappbare Karte. Zugeklappt zeigt der
+ *  Kopf, was gerade gefiltert ist; aufgeklappt stehen darunter erst die
+ *  Mannschaften, dann Training oder Spiele. */
+function filterKarte({ teams, anzahlTeam, imKalender }) {
+  const team = teams.find((eintrag) => eintrag.key === zustand.uebersichtTeam);
+  const gefiltert = Boolean(team) || zustand.uebersichtArt !== "alle";
+  const zusammenfassung = [
+    team ? team.name : "Alle Teams",
+    zustand.uebersichtArt === "alle" ? null : ART_NAMEN[zustand.uebersichtArt],
+    String(imKalender),
+  ].filter(Boolean).join(" · ");
+
+  const kopf = h("button", {
+    type: "button",
+    class: "filter-kopf",
+    "aria-expanded": String(zustand.filterOffen),
+    "aria-controls": "filter-inhalt",
+    onclick: () => { zustand.filterOffen = !zustand.filterOffen; filterOffenMerken(); zeichnen(); },
+  },
+    h("span", { class: "filter-kopf__name", text: "Filter" }),
+    h("span", { class: gefiltert ? "filter-kopf__wert filter-kopf__wert--aktiv" : "filter-kopf__wert", text: zusammenfassung })
+  );
+  kopf.insertAdjacentHTML("beforeend",
+    '<svg class="filter-kopf__pfeil" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg>');
+
+  if (!zustand.filterOffen) return h("div", { class: "filterkarte" }, kopf);
+
+  return h("div", { class: "filterkarte" }, kopf,
+    h("div", { class: "filter-inhalt", id: "filter-inhalt" },
+      h("div", { class: "filter-titel", text: "Mannschaft" }),
+      h("div", { class: "chips", "data-scroll": "teams", role: "group", "aria-label": "Mannschaft" },
+        chip({
+          gewaehlt: !team,
+          onclick: () => { zustand.uebersichtTeam = "alle"; zeichnen(); },
+          kurz: "Alle",
+          zahl: anzahlTeam("alle"),
+        }),
+        teams.map((eintrag) =>
+          chip({
+            gewaehlt: team === eintrag,
+            onclick: () => { zustand.uebersichtTeam = eintrag.key; zeichnen(); },
+            kurz: eintrag.name,
+            zahl: anzahlTeam(eintrag.key),
+            farbe: eintrag.farbe,
+          })
+        )
+      ),
+      h("div", { class: "filter-titel", text: "Art" }),
+      h("div", { class: "filter-segmente" },
+        h("div", { class: "segmente", role: "group", "aria-label": "Art" },
+          Object.entries(ART_NAMEN).map(([wert, name]) =>
+            h("button", {
+              type: "button",
+              "aria-pressed": String(zustand.uebersichtArt === wert),
+              onclick: () => { zustand.uebersichtArt = wert; zeichnen(); },
+            }, name)
+          )
+        )
+      )
     )
   );
+}
 
-  const gezeigt = zustand.feedFilter === "alle"
-    ? liste
-    : liste.filter((e) => feedVon(e) === zustand.feedFilter);
+function uebersicht() {
+  const liste = alleTermine();
+  // Gezählt wird, was wirklich im Kalender landet -- Ausgeblendetes nicht.
+  const imKalender = (e) => !zustand.hidden.has(e.uid);
+  const passtArt = (e) => zustand.uebersichtArt === "alle" || e.type === zustand.uebersichtArt;
+
+  // Mannschaften in der Reihenfolge der Feeds aus config.yaml, der
+  // Extra-Feed zuletzt. Nur, wer im Zeitraum überhaupt Termine hat.
+  const teams = [];
+  for (const feed of zustand.pool.feeds) {
+    const key = feed.team_key || feed.key;
+    if (teams.some((eintrag) => eintrag.key === key)) continue;
+    if (!liste.some((e) => uebersichtTeamVon(e) === key)) continue;
+    const team = zustand.pool.teams.find((eintrag) => eintrag.key === feed.team_key);
+    teams.push({ key, name: team ? team.name : feed.name, farbe: feedFarbe(feed) });
+  }
+  // Eine Auswahl, die es im Zeitraum nicht mehr gibt, zählt als „Alle“.
+  const teamGewaehlt = teams.some((eintrag) => eintrag.key === zustand.uebersichtTeam);
+  const passtTeam = (e) => !teamGewaehlt || uebersichtTeamVon(e) === zustand.uebersichtTeam;
+
+  const anzahlTeam = (key) => liste.filter((e) =>
+    imKalender(e) && passtArt(e) && (key === "alle" || uebersichtTeamVon(e) === key)
+  ).length;
+
+  const gezeigt = liste.filter((e) => passtTeam(e) && passtArt(e));
+  const filter = filterKarte({ teams, anzahlTeam, imKalender: gezeigt.filter(imKalender).length });
 
   if (!gezeigt.length) {
     return h("div", {}, filter,
       h("div", { class: "hinweis" },
-        "Für den gewählten Zeitraum steht hier nichts in den Kalendern. " +
-        "Wähle oben einen größeren Zeitraum, oder hole dir unter " +
+        "Für den gewählten Zeitraum und Filter steht hier nichts in den Kalendern. " +
+        "Wähle oben einen größeren Zeitraum, lockere den Filter, oder hole dir unter " +
         "„Andere Teams“ und „Gemerkte Spiele“ etwas dazu."
       )
     );
@@ -2514,7 +2783,7 @@ function andereTeams() {
     .filter(Boolean)
     .map((e) => ({ key: e.team_key, name: e.team }));
 
-  const filter = h("div", { class: "chips", role: "group", "aria-label": "Team" },
+  const filter = h("div", { class: "chips", "data-scroll": "andere", role: "group", "aria-label": "Team" },
     chip({
       gewaehlt: zustand.teamFilter === "alle",
       onclick: () => { zustand.teamFilter = "alle"; zeichnen(); },
@@ -2660,10 +2929,9 @@ function gemerkteSpiele() {
     },
   });
 
-  const grenze = grenzeVon(zustand.zeitraum);
   const bekannt = (zustand.pool ? zustand.pool.events : [])
     .filter((e) => e.team_key === "watch")
-    .filter((e) => tagVon(e.dtstart) >= grenze)
+    .filter(imZeitraum)
     .sort((a, b) => String(a.dtstart).localeCompare(String(b.dtstart)));
 
   const bekanntNummern = new Set(
@@ -3294,7 +3562,13 @@ el("speichern").addEventListener("click", () => speichern());
 
 el("zeitraum").addEventListener("change", (ereignis) => {
   zustand.zeitraum = ereignis.target.value;
+  if (zustand.zeitraum === "datum" && !zustand.von) {
+    // Vorschlag: die kommende Woche. Von und Bis stehen dann unter dem Titel.
+    zustand.von = new Date().toLocaleDateString("sv-SE");
+    zustand.bis = tagPlus(zustand.von, 6);
+  }
   zeichnen();
+  window.scrollTo({ top: 0 });
 });
 
 for (const knopf of el("navigation").querySelectorAll("button")) {
@@ -3308,6 +3582,11 @@ for (const knopf of el("navigation").querySelectorAll("button")) {
 }
 
 el("zahnrad").addEventListener("click", darstellungUmschalten);
+
+el("nach-oben").addEventListener("click", () => {
+  const ruhig = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: ruhig ? "auto" : "smooth" });
+});
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) darstellungSpeichern();
