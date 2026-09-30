@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-30T04:48:00.375056+00:00",
+  "generated": "2026-09-30T12:11:14.181675+00:00",
   "teams": [
     {
       "key": "m1",
@@ -806,8 +806,8 @@
       "own_team": false,
       "type": "spiele",
       "summary": "1. Damen Heim TuS Königsdorf",
-      "dtstart": "2026-10-03T20:00:00+02:00",
-      "dtend": "2026-10-03T21:30:00+02:00",
+      "dtstart": "2026-10-03T20:15:00+02:00",
+      "dtend": "2026-10-03T21:45:00+02:00",
       "all_day": false,
       "location": "Sporthalle Fliethe, Fortunastraße 30, 42489 Wülfrath, Deutschland",
       "cancelled": false
