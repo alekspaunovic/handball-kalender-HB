@@ -17,9 +17,12 @@ class TeamConfig:
     # Fehlt bei den gemerkten Spielen: dort ist die Quelle ein Abruf pro
     # Spielnummer, kein Team-Kalender.
     handballnet_team_id: int | None = None
-    # Eigenname bei handball.net fuer die Gegnererkennung. Fehlt er, wird er
-    # aus dem X-WR-CALNAME des Quell-Feeds gelesen (SPEC.md Abschnitt 4).
+    # Eigenname bei handball.net fuer die Gegnererkennung. Zusaetzlich gilt
+    # immer der X-WR-CALNAME des Quell-Feeds (SPEC.md Abschnitt 4).
     handballnet_name: str | None = None
+    # Alle Eigennamen fuer die Gegnererkennung: handballnet_name und der
+    # X-WR-CALNAME. Setzt spiele.resolve_own_name je Lauf, nicht config.yaml.
+    eigennamen: tuple[str, ...] = ()
     spielerplus_env: str | None = None
     # None heisst "keine Treffpunkt-Notiz" -- so sind die Fremdteams als reine
     # Zuschauertermine konfiguriert (SPEC-ADMIN.md Abschnitt 3).

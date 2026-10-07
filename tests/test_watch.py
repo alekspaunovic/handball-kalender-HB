@@ -178,6 +178,8 @@ def test_all_day_match_gets_uhrzeit_noch_offen(config):
 def test_protected_uid_is_not_marked_cancelled_when_missing():
     """Schlägt der Abruf einer Spielnummer fehl, wissen wir nichts über das
     Spiel und dürfen es nicht als abgesagt markieren."""
+    # Zuletzt vor dem Spiel gesehen -- sonst hätte es stattgefunden.
+    zuvor = datetime(2026, 9, 10, 6, 0, tzinfo=dt_timezone.utc)
     eintrag = {
         "uid": "tbw-watch-spiel-563599",
         "source_uid": "spiel-563599@mmcc-news",
@@ -190,8 +192,8 @@ def test_protected_uid_is_not_marked_cancelled_when_missing():
         "description": "Oberliga männliche Jugend A",
         "url": "",
         "cancelled": False,
-        "first_seen": NOW.isoformat(),
-        "last_seen": NOW.isoformat(),
+        "first_seen": zuvor.isoformat(),
+        "last_seen": zuvor.isoformat(),
     }
     danach = datetime(2026, 9, 20, 6, 0, tzinfo=dt_timezone.utc)
 

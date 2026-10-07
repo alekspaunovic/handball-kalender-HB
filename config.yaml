@@ -35,6 +35,10 @@ extra_farbe_dunkel: "#98989d"
 # dunklen Modus. Es sind die vollen Grundfarben (die Systemfarben von iOS:
 # Tuerkis, Pink, Blau, Grau); wie kraeftig sie in der Oberflaeche erscheinen,
 # stellt man dort unter Darstellung -> Farbstaerke ein (darstellung.json).
+#
+# handballnet_name ist der Eigenname bei handball.net fuer die
+# Gegnererkennung. Daneben zaehlt immer der X-WR-CALNAME des Feeds, der bei
+# einer Umbenennung durch handball.net mitzieht (SPEC.md Abschnitt 4).
 teams:
   m1:
     anzeigename: "1. Herren"

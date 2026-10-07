@@ -1,4 +1,23 @@
-from handball_kalender import spiele
+from handball_kalender import ics_io, spiele
+
+# Ein Heimspiel der 2. Herren, nachdem handball.net das Team umbenannt hat:
+# X-WR-CALNAME und SUMMARY tragen den neuen Namen, config.yaml noch den alten.
+_UMBENANNT = """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//MMCC-News//Spielplan//DE
+X-WR-CALNAME:TB WÜLFRATH M2
+BEGIN:VEVENT
+UID:spiel-380470@mmcc-news
+DTSTAMP:20261001T094827Z
+DTSTART:20261003T154500
+DTEND:20261003T174500
+SUMMARY:TB WÜLFRATH M2 - HSG Wesel
+DESCRIPTION:Verbandsliga MÄNNLICH\\nSpieltag 3\\nPendiente
+URL:https://www.handball.net/match/380470
+LOCATION:MTC ARENA WüLFRATH\\, FORTUNA STR. 30\\, 42489 WüLFRATH
+END:VEVENT
+END:VCALENDAR
+"""
 
 
 def test_m2_spiel_gegen_luettringhauser_tv_exact_title(config, halls, handballnet_m2):
@@ -76,3 +95,45 @@ def test_opponent_override_applied(config, halls, handballnet_m2):
         vevent, config.teams["m2"], halls, overrides, config.uid_prefix, config.timezone
     )
     assert "Neusser Handballverein" in event.summary
+
+
+def test_eigenname_aus_calname_nach_umbenennung(config, halls):
+    """handball.net hat die Teams im Herbst 2026 umbenannt ("TB Wülfrath II"
+    -> "TB WÜLFRATH M2"). Mit nur dem Namen aus config.yaml stand das eigene
+    Team als Gegner im Titel ("2. Herren Heim TB Wülfrath M2"). Der
+    X-WR-CALNAME zieht mit und zählt deshalb immer mit (SPEC.md Abschnitt 4)."""
+    cal = ics_io.parse_calendar(_UMBENANNT.encode("utf-8"))
+    vevent = next(iter(ics_io.iter_vevents(cal)))
+    team = spiele.resolve_own_name(config.teams["m2"], cal)
+    assert team.eigennamen == ("TB Wülfrath II", "TB WÜLFRATH M2")
+    event = spiele.transform(
+        vevent, team, halls, config.opponent_overrides, config.uid_prefix, config.timezone
+    )
+    assert event.summary == "2. Herren Heim HSG Wesel"
+
+
+def test_eigenname_aus_config_gilt_weiter(config, halls, handballnet_m3):
+    """Auch wenn der X-WR-CALNAME einmal nicht passt, erkennt der Name aus
+    config.yaml das eigene Team weiter."""
+    cal = ics_io.parse_calendar(
+        _UMBENANNT.replace("X-WR-CALNAME:TB WÜLFRATH M2", "X-WR-CALNAME:Spielplan").encode("utf-8")
+    )
+    team = spiele.resolve_own_name(config.teams["m3"], cal)
+    assert team.eigennamen == ("TB Wülfrath III", "Spielplan")
+    event = spiele.transform(
+        handballnet_m3["spiel-674195@mmcc-news"],
+        team,
+        halls,
+        config.opponent_overrides,
+        config.uid_prefix,
+        config.timezone,
+    )
+    assert event.summary == "3. Herren Auswärts TB Wülfrath IV"
+
+
+def test_kein_eigenname_auf_beiden_seiten_wird_geloggt(config, caplog):
+    team = spiele.resolve_own_name(config.teams["m2"], ics_io.parse_calendar(_UMBENANNT.encode("utf-8")))
+    with caplog.at_level("WARNING"):
+        gegner = spiele.resolve_opponent("TV Beispiel", "HSG Wesel", team)
+    assert gegner == "TV Beispiel"
+    assert "Eigenname" in caplog.text
