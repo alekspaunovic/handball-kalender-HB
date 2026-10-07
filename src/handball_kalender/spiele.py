@@ -54,25 +54,39 @@ def split_summary(raw_summary: str) -> tuple[str, str, str | None]:
 
 
 def resolve_own_name(team: TeamConfig, cal) -> TeamConfig:
-    """Eigenname fuer die Gegnererkennung. Steht er nicht in config.yaml -- so
-    bei den Fremdteams, SPEC-ADMIN.md Abschnitt 3 -- kommt er aus dem
-    X-WR-CALNAME der Quelle (SPEC.md Abschnitt 4)."""
-    if team.handballnet_name:
-        return team
-    return dataclasses.replace(team, handballnet_name=calendar_name(cal))
+    """Eigennamen fuer die Gegnererkennung: handballnet_name aus config.yaml
+    und der X-WR-CALNAME der Quelle (SPEC.md Abschnitt 4). Der X-WR-CALNAME
+    zieht mit, wenn handball.net ein Team umbenennt -- so wurde im Herbst
+    2026 aus "TB Wülfrath II" "TB Wülfrath M2" --, config.yaml nicht. Den
+    Fremdteams (SPEC-ADMIN.md Abschnitt 3) fehlt handballnet_name ganz."""
+    eigennamen = []
+    for name in (team.handballnet_name, calendar_name(cal)):
+        if name and name not in eigennamen:
+            eigennamen.append(name)
+    return dataclasses.replace(team, eigennamen=tuple(eigennamen))
 
 
 def resolve_opponent(heim_seite: str, gast_seite: str, team: TeamConfig) -> str:
-    if not team.handballnet_name:
+    eigennamen = team.eigennamen or tuple(filter(None, [team.handballnet_name]))
+    if not eigennamen:
         logger.warning(
             "Kein Eigenname für %s (weder in config.yaml noch als X-WR-CALNAME "
             "der Quelle), Gegner kann nicht bestimmt werden",
             team.key,
         )
         return heim_seite
-    own = _normalize_for_compare(team.handballnet_name)
-    if _normalize_for_compare(heim_seite) == own:
+    own = {_normalize_for_compare(name) for name in eigennamen}
+    if _normalize_for_compare(heim_seite) in own:
         return gast_seite
+    if _normalize_for_compare(gast_seite) not in own:
+        logger.warning(
+            "Weder %r noch %r ist ein Eigenname von %s (%s), Heimseite gilt "
+            "als Gegner",
+            heim_seite,
+            gast_seite,
+            team.key,
+            ", ".join(eigennamen),
+        )
     return heim_seite
 
 

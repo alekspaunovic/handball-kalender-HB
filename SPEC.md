@@ -86,10 +86,14 @@ Der Nutzer setzt sich das bei Bedarf selbst.
 | --- | --- | --- | --- | --- | --- |
 | M1 | 1. Herren | TB Wülfrath | 1:15 h vorher | 5 min vorher | 1:30 h |
 
-Der Eigenname wird aus dem `X-WR-CALNAME` des jeweiligen handball.net-Feeds
-gelesen, nicht hart kodiert. Vergleich immer case-insensitiv und ohne
-Mehrfach-Leerzeichen, weil die Schreibweise zwischen den Feeds schwankt
-(`TB WÜLFRATH III` vs. `TB Wülfrath II`).
+Als Eigenname zählen der Name aus der Tabelle (`handballnet_name` in
+`config.yaml`) und der `X-WR-CALNAME` des jeweiligen handball.net-Feeds,
+beide gleichberechtigt. Der `X-WR-CALNAME` zieht mit, wenn handball.net ein
+Team umbenennt -- im Herbst 2026 wurde etwa aus `TB Wülfrath`
+`TB Wülfrath M1` --, `config.yaml` nicht. Fremdteams haben gar keinen
+`handballnet_name`, bei ihnen zählt nur der `X-WR-CALNAME`. Vergleich immer
+case-insensitiv und ohne Mehrfach-Leerzeichen, weil die Schreibweise zwischen
+den Feeds schwankt (`TB WÜLFRATH III` vs. `TB Wülfrath II`).
 
 ## 5. Transformation Trainings (SpielerPlus)
 
@@ -179,8 +183,11 @@ in Klammern. Vorgehen:
 
 1. Ergebnis in Klammern am Ende abtrennen und merken
 2. An ` - ` splitten
-3. Die Seite, die dem Eigennamen des Teams entspricht, ist man selbst
-4. Die andere Seite ist der Gegner
+3. Die Seite, die einem der Eigennamen des Teams (Abschnitt 4) entspricht,
+   ist man selbst
+4. Die andere Seite ist der Gegner. Passt keine Seite, gilt die Heimseite als
+   Gegner und das Skript loggt eine Warnung -- meist hat handball.net das
+   Team umbenannt.
 
 Achtung: Bei `TB WÜLFRATH III - TB WÜLFRATH IV` stehen auf beiden Seiten
 TB Wülfrath. Der Vergleich muss deshalb auf den vollständigen Seitenstring
@@ -291,10 +298,21 @@ handball.net führt in der DESCRIPTION ein Statuswort:
 
 Weitere unbekannte Statuswörter: als normal behandeln und loggen.
 
-Zusätzlich die Verschwinden-Logik: Ist ein Spiel im Archiv, taucht aber nicht
-mehr in der Quelle auf, bleibt es zunächst unverändert stehen. Erst wenn sein
-Termin vorbei ist und es weiterhin fehlt, bekommt es das ABGESAGT-Präfix. So
-werden Verlegungen nicht fälschlich als Absage markiert.
+Zusätzlich die Verschwinden-Logik, für Spiele und Trainings: Ist ein Termin
+im Archiv, taucht aber nicht mehr in der Quelle auf, bleibt er zunächst
+unverändert stehen. Erst wenn er vorbei ist und weiterhin fehlt, bekommt er
+das ABGESAGT-Präfix. So werden Verlegungen nicht fälschlich als Absage
+markiert.
+
+Ausgenommen ist ein Termin, den die Quelle nach seinem Beginn noch geführt hat
+(`last_seen` nach `dtstart`, bei ganztägigen Terminen ab dem Folgetag): Er hat
+stattgefunden und ist nur aus dem Zeitfenster der Quelle gefallen. SpielerPlus
+behält vergangene Termine rund drei Monate, handball.net nahm die
+Turnierspiele der C-Jugend vom 19.09.2026 neun Tage später aus dem
+Team-Kalender. Beides wurde vorher als Absage markiert.
+
+Taucht ein verschwundener Termin wieder in der Quelle auf, gilt wieder die
+Quelle -- die Absage ist aufgehoben.
 
 Ändern sich Zeit oder Ort eines bekannten Spiels, wird der Archiveintrag
 aktualisiert. Die UID bleibt dabei stabil, damit der Apple-Kalender den Termin
@@ -375,6 +393,14 @@ Struktur je Eintrag:
 }
 ```
 
+Abgesagte Einträge tragen zusätzlich `abgesagt_weil`: `quelle`, wenn die
+Quelle die Absage meldet (`Retirado`), `verschwunden`, wenn sie aus der
+Verschwinden-Logik stammt (Abschnitt 7). Nur eine Absage `verschwunden` darf
+das Skript selbst zurücknehmen. Abgesagte Einträge ohne das Feld stammen aus
+der Zeit davor. Fehlen sie in der Quelle, sind es Absagen der
+Verschwinden-Logik: Stand der Termin nach seinem Beginn noch in der Quelle,
+wird die Absage zurückgenommen, sonst bekommt er `verschwunden`.
+
 Der Feed wird immer vollständig aus dem Archiv erzeugt, nicht aus der Quelle.
 Die Quelle aktualisiert nur das Archiv.
 
@@ -413,11 +439,16 @@ Mindestens abzudecken:
 - M2-Spiel gegen Lüttringhauser TV ergibt exakt den Titel aus dem Wunschformat
 - MC-Turnierspiel am 19.09. mit TB Wülfrath auf der Heimseite wird `Auswärts`
 - `TB WÜLFRATH III - TB WÜLFRATH IV` erkennt den richtigen Gegner
+- Nach einer Umbenennung bei handball.net erkennt der `X-WR-CALNAME` das
+  eigene Team, auch wenn `config.yaml` noch den alten Namen führt
 - `Retirado` erzeugt das ABGESAGT-Präfix
 - Ganztagesspiel bekommt keine Treffpunkt-Notiz
 - Spiel mit Ergebnis in der SUMMARY: Ergebnis wandert in die Notiz
 - Verschwundenes Spiel vor dem Termin bleibt unverändert, nach dem Termin wird
   es als abgesagt markiert
+- Termin, der nach seinem Beginn noch in der Quelle stand und dann
+  verschwindet, bleibt unverändert; eine alte Absage dieser Art wird
+  zurückgenommen, eine Absage der Quelle nie
 - Adressbereinigung für alle drei Beispielstrings aus Abschnitt 9
 
 ## 13. Offene Punkte
