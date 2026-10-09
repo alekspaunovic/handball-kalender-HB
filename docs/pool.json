@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-09T12:51:23.559438+00:00",
+  "generated": "2026-10-09T22:26:21.128979+00:00",
   "teams": [
     {
       "key": "m1",
@@ -1190,27 +1190,27 @@
       "cancelled": false
     },
     {
-      "uid": "tbw-m1-spiel-544768",
-      "team": "1. Herren",
-      "team_key": "m1",
-      "own_team": true,
-      "type": "spiele",
-      "summary": "1. Herren Auswärts LTV Wuppertal",
-      "dtstart": "2026-11-15T14:00:00+01:00",
-      "dtend": "2026-11-15T15:30:00+01:00",
-      "all_day": false,
-      "location": "Langerfeld-Buschenburg Wuppertal, Dieckerhoff Str.18, 42389 Wuppertal, Deutschland",
-      "cancelled": false
-    },
-    {
       "uid": "tbw-2-herren-spiel-380497",
       "team": "2. Herren",
       "team_key": "2-herren",
       "own_team": false,
       "type": "spiele",
       "summary": "2. Herren Auswärts LTV Wuppertal II",
-      "dtstart": "2026-11-15T16:00:00+01:00",
-      "dtend": "2026-11-15T17:30:00+01:00",
+      "dtstart": "2026-11-15T12:30:00+01:00",
+      "dtend": "2026-11-15T14:00:00+01:00",
+      "all_day": false,
+      "location": "Langerfeld-Buschenburg Wuppertal, Dieckerhoff Str.18, 42389 Wuppertal, Deutschland",
+      "cancelled": false
+    },
+    {
+      "uid": "tbw-m1-spiel-544768",
+      "team": "1. Herren",
+      "team_key": "m1",
+      "own_team": true,
+      "type": "spiele",
+      "summary": "1. Herren Auswärts LTV Wuppertal",
+      "dtstart": "2026-11-15T15:00:00+01:00",
+      "dtend": "2026-11-15T16:30:00+01:00",
       "all_day": false,
       "location": "Langerfeld-Buschenburg Wuppertal, Dieckerhoff Str.18, 42389 Wuppertal, Deutschland",
       "cancelled": false
