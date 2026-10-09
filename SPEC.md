@@ -279,7 +279,14 @@ Zeile 1: `Treffpunkt: HH:MM` (Anwurf minus Vorlauf laut Team-Konfiguration).
 Bei Auswärtsspielen ist der Treffpunkt an der Gasthalle, es braucht deshalb
 keinen Zusatztext.
 
-Zeile 2, nur wenn ein Ergebnis in der SUMMARY stand: `Ergebnis: 34:25`
+Zeile 2, nur wenn ein Ergebnis in der SUMMARY stand: `Ergebnis: 34:25
+(Gewonnen)`. Das Ergebnis bleibt in der Reihenfolge der Quelle (Heim:Gast).
+Die Wertung in Klammern -- `Gewonnen`, `Verloren` oder `Unentschieden` --
+gilt aus Sicht des Teams und richtet sich nach seiner Seite in der SUMMARY,
+nicht nach Heim/Auswärts im Titel: Beim Turnier steht TB Wülfrath auf der
+Heimseite, obwohl auswärts gespielt wird. Entspricht keine Seite einem
+Eigennamen (Abschnitt 4), entfällt die Wertung, ebenso bei `0:0` -- das ist
+im Handball kein Ergebnis, sondern ein Platzhalter der Quelle.
 
 Ganztagestermine bekommen statt Zeile 1 die Zeile `Uhrzeit noch offen`.
 
@@ -443,7 +450,9 @@ Mindestens abzudecken:
   eigene Team, auch wenn `config.yaml` noch den alten Namen führt
 - `Retirado` erzeugt das ABGESAGT-Präfix
 - Ganztagesspiel bekommt keine Treffpunkt-Notiz
-- Spiel mit Ergebnis in der SUMMARY: Ergebnis wandert in die Notiz
+- Spiel mit Ergebnis in der SUMMARY: Ergebnis wandert in die Notiz, mit
+  Wertung aus Sicht des Teams (Heim und Gast, gewonnen, verloren,
+  unentschieden; Turnierspiel mit Heimseite in fremder Halle)
 - Verschwundenes Spiel vor dem Termin bleibt unverändert, nach dem Termin wird
   es als abgesagt markiert
 - Termin, der nach seinem Beginn noch in der Quelle stand und dann

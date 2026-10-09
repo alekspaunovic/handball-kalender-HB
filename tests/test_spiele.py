@@ -1,3 +1,5 @@
+import dataclasses
+
 from handball_kalender import ics_io, spiele
 
 # Ein Heimspiel der 2. Herren, nachdem handball.net das Team umbenannt hat:
@@ -48,7 +50,7 @@ def test_wuelfrath_iii_vs_iv_resolves_correct_opponent_all_day_and_result(config
     )
     assert event.summary == "3. Herren Auswärts TB Wülfrath IV"
     assert event.all_day is True
-    assert event.description == "Uhrzeit noch offen\nErgebnis: 34:25"
+    assert event.description == "Uhrzeit noch offen\nErgebnis: 34:25 (Gewonnen)"
 
 
 def test_retirado_gets_abgesagt_prefix(config, halls, handballnet_m3):
@@ -137,3 +139,67 @@ def test_kein_eigenname_auf_beiden_seiten_wird_geloggt(config, caplog):
         gegner = spiele.resolve_opponent("TV Beispiel", "HSG Wesel", team)
     assert gegner == "TV Beispiel"
     assert "Eigenname" in caplog.text
+
+
+# --- Wertung hinter dem Ergebnis ---------------------------------------------
+
+def _spiel_aus(config, halls, datei, team_key, teil_der_summary):
+    """Ein Spiel aus einer Fixture, mit Eigennamen wie im echten Lauf."""
+    from conftest import FIXTURES_DIR
+
+    cal = ics_io.parse_calendar((FIXTURES_DIR / datei).read_bytes())
+    team = spiele.resolve_own_name(config.teams[team_key], cal)
+    vevent = next(v for v in ics_io.iter_vevents(cal) if teil_der_summary in str(v["SUMMARY"]))
+    return spiele.transform(vevent, team, halls, config.opponent_overrides, config.uid_prefix, config.timezone)
+
+
+def test_auswaerts_gewonnen_wenn_gast_mehr_tore_hat(config, halls):
+    """TSG 1893 LEIHGESTERN - TB WÜLFRATH (23:34): Heim:Gast, Wülfrath ist Gast."""
+    event = _spiel_aus(config, halls, "handballnet-1-damen.ics", "1-damen", "LEIHGESTERN")
+    assert event.description.endswith("Ergebnis: 23:34 (Gewonnen)")
+
+
+def test_auswaerts_verloren(config, halls):
+    """BTB AACHEN - TB WÜLFRATH (42:20)."""
+    event = _spiel_aus(config, halls, "handballnet-a-jugend.ics", "a-jugend", "BTB AACHEN")
+    assert event.description.endswith("Ergebnis: 42:20 (Verloren)")
+
+
+def test_heim_verloren(config, halls):
+    """TB WÜLFRATH - PSV RECKLINGHAUSEN (37:40)."""
+    event = _spiel_aus(config, halls, "handballnet-1-damen.ics", "1-damen", "RECKLINGHAUSEN")
+    assert event.description.endswith("Ergebnis: 37:40 (Verloren)")
+
+
+def test_unentschieden(config):
+    team = spiele.resolve_own_name(config.teams["m2"], ics_io.parse_calendar(_UMBENANNT.encode("utf-8")))
+    seite = spiele.eigene_seite("HSG Wesel", "TB WÜLFRATH M2", team)
+    assert seite == "gast"
+    assert spiele.wertung("27:27", seite) == "Unentschieden"
+
+
+def test_turnier_seite_zaehlt_nicht_die_halle(config, halls, handballnet_mc):
+    """Beim Turnier am 19.09. in Wipperfürth stand TB Wülfrath auf der
+    Heimseite, gespielt wurde aber auswärts (Titel "Auswärts"). Für die
+    Wertung zählt die Seite in der SUMMARY, denn nach ihr richtet sich die
+    Reihenfolge des Ergebnisses."""
+    import copy
+
+    vevent = copy.deepcopy(handballnet_mc["spiel-677568@mmcc-news"])
+    vevent["SUMMARY"] = f"{vevent['SUMMARY']} (16:10)"
+    team = dataclasses.replace(config.teams["mc"], eigennamen=("TB Wülfrath", "TB WÜLFRATH"))
+    event = spiele.transform(vevent, team, halls, config.opponent_overrides, config.uid_prefix, config.timezone)
+    assert event.summary == "C-Jugend Auswärts MTG Horst Essen"
+    assert event.description.endswith("Ergebnis: 16:10 (Gewonnen)")
+
+
+def test_null_zu_null_ist_kein_unentschieden():
+    """handball.net führt beim Freundschaftsspiel M4 - M3 am 19.09. ein 0:0 --
+    ein Platzhalter, kein Ergebnis."""
+    assert spiele.wertung("0:0", "gast") is None
+
+
+def test_ohne_erkannte_seite_keine_wertung(config):
+    team = spiele.resolve_own_name(config.teams["m2"], ics_io.parse_calendar(_UMBENANNT.encode("utf-8")))
+    assert spiele.eigene_seite("TV Beispiel", "HSG Wesel", team) is None
+    assert spiele.wertung("30:20", None) is None

@@ -125,7 +125,7 @@ def test_included_foreign_game_has_no_treffpunkt_note(config, a_jugend):
 
     # Zuschauertermin: kein Treffpunkt, aber das Ergebnis bleibt.
     assert "Treffpunkt" not in entries[0]["description"]
-    assert entries[0]["description"] == "Ergebnis: 33:26"
+    assert entries[0]["description"] == "Ergebnis: 33:26 (Gewonnen)"
 
 
 def test_moved_foreign_game_moves_in_extra_feed_and_keeps_its_uid(config, a_jugend):
