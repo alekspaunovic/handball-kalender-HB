@@ -66,7 +66,10 @@ def resolve_own_name(team: TeamConfig, cal) -> TeamConfig:
     return dataclasses.replace(team, eigennamen=tuple(eigennamen))
 
 
-def resolve_opponent(heim_seite: str, gast_seite: str, team: TeamConfig) -> str:
+def eigene_seite(heim_seite: str, gast_seite: str, team: TeamConfig) -> str | None:
+    """Auf welcher Seite der SUMMARY das Team steht: "heim", "gast" oder None,
+    wenn keine Seite einem Eigennamen entspricht. Gemeint ist die Seite in der
+    SUMMARY, nicht Heim/Auswärts im Titel -- das bestimmt die Halle."""
     eigennamen = team.eigennamen or tuple(filter(None, [team.handballnet_name]))
     if not eigennamen:
         logger.warning(
@@ -74,20 +77,45 @@ def resolve_opponent(heim_seite: str, gast_seite: str, team: TeamConfig) -> str:
             "der Quelle), Gegner kann nicht bestimmt werden",
             team.key,
         )
-        return heim_seite
+        return None
     own = {_normalize_for_compare(name) for name in eigennamen}
     if _normalize_for_compare(heim_seite) in own:
+        return "heim"
+    if _normalize_for_compare(gast_seite) in own:
+        return "gast"
+    logger.warning(
+        "Weder %r noch %r ist ein Eigenname von %s (%s), Heimseite gilt "
+        "als Gegner",
+        heim_seite,
+        gast_seite,
+        team.key,
+        ", ".join(eigennamen),
+    )
+    return None
+
+
+def resolve_opponent(heim_seite: str, gast_seite: str, team: TeamConfig) -> str:
+    if eigene_seite(heim_seite, gast_seite, team) == "heim":
         return gast_seite
-    if _normalize_for_compare(gast_seite) not in own:
-        logger.warning(
-            "Weder %r noch %r ist ein Eigenname von %s (%s), Heimseite gilt "
-            "als Gegner",
-            heim_seite,
-            gast_seite,
-            team.key,
-            ", ".join(eigennamen),
-        )
     return heim_seite
+
+
+def wertung(ergebnis: str, seite: str | None) -> str | None:
+    """Gewonnen, Verloren oder Unentschieden aus Sicht des Teams. Das Ergebnis
+    steht in der Quelle als Heim:Gast. Ohne bekannte Seite keine Wertung --
+    lieber keine als eine falsche. Ebenso bei 0:0: das ist im Handball kein
+    Spielergebnis, sondern ein Platzhalter der Quelle."""
+    if seite is None:
+        return None
+    heim, gast = (int(tore) for tore in ergebnis.split(":"))
+    if heim == gast == 0:
+        return None
+    eigene, andere = (heim, gast) if seite == "heim" else (gast, heim)
+    if eigene > andere:
+        return "Gewonnen"
+    if eigene < andere:
+        return "Verloren"
+    return "Unentschieden"
 
 
 def resolve_location(
@@ -121,7 +149,8 @@ def transform(
     raw_description = str(vevent.get("DESCRIPTION", ""))
 
     heim_seite, gast_seite, ergebnis = split_summary(raw_summary)
-    opponent_raw = resolve_opponent(heim_seite, gast_seite, team)
+    seite = eigene_seite(heim_seite, gast_seite, team)
+    opponent_raw = gast_seite if seite == "heim" else heim_seite
     opponent = normalize_opponent(opponent_raw, opponent_overrides)
 
     location = extract_location(vevent)
@@ -155,7 +184,8 @@ def transform(
         treffpunkt = dtstart - timedelta(minutes=team.treffpunkt_spiel_minuten)
         notiz_lines.append(f"Treffpunkt: {treffpunkt.strftime('%H:%M')}")
     if ergebnis:
-        notiz_lines.append(f"Ergebnis: {ergebnis}")
+        ausgang = wertung(ergebnis, seite)
+        notiz_lines.append(f"Ergebnis: {ergebnis} ({ausgang})" if ausgang else f"Ergebnis: {ergebnis}")
 
     title = f"{team.anzeigename} {'Heim' if is_heim else 'Auswärts'} {opponent}"
     if cancelled:
