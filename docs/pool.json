@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-19T12:36:31.859473+00:00",
+  "generated": "2026-10-19T22:08:20.963743+00:00",
   "teams": [
     {
       "key": "m1",
@@ -974,12 +974,12 @@
       "team_key": "m1",
       "own_team": true,
       "type": "training",
-      "summary": "Training 1. Herren",
+      "summary": "ABGESAGT Training 1. Herren",
       "dtstart": "2026-10-19T20:25:00+02:00",
       "dtend": "2026-10-19T22:00:00+02:00",
       "all_day": false,
       "location": "Sporthalle Fliethe, Fortunastraße 30, 42489 Wülfrath, Deutschland",
-      "cancelled": false
+      "cancelled": true
     },
     {
       "uid": "tbw-m1-training-77868506",
