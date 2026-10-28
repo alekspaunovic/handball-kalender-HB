@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-28T12:24:22.736965+00:00",
+  "generated": "2026-10-28T22:22:06.898277+00:00",
   "teams": [
     {
       "key": "m1",
@@ -1196,8 +1196,8 @@
       "own_team": false,
       "type": "spiele",
       "summary": "2. Herren Auswärts LTV Wuppertal II",
-      "dtstart": "2026-11-15T12:30:00+01:00",
-      "dtend": "2026-11-15T14:00:00+01:00",
+      "dtstart": "2026-11-15T13:00:00+01:00",
+      "dtend": "2026-11-15T14:30:00+01:00",
       "all_day": false,
       "location": "Langerfeld-Buschenburg Wuppertal, Dieckerhoff Str.18, 42389 Wuppertal, Deutschland",
       "cancelled": false
