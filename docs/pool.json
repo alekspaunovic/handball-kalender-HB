@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-19T00:02:21.295961+00:00",
+  "generated": "2026-11-19T15:28:32.505260+00:00",
   "teams": [
     {
       "key": "m1",
@@ -1248,7 +1248,7 @@
       "own_team": true,
       "type": "training",
       "summary": "Training 1. Herren",
-      "dtstart": "2026-11-19T18:30:00+01:00",
+      "dtstart": "2026-11-19T18:55:00+01:00",
       "dtend": "2026-11-19T20:30:00+01:00",
       "all_day": false,
       "location": "Sporthalle Fliethe, Fortunastraße 30, 42489 Wülfrath, Deutschland",
