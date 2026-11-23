@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-23T06:38:15.896953+00:00",
+  "generated": "2026-11-23T23:36:21.642181+00:00",
   "teams": [
     {
       "key": "m1",
@@ -1563,7 +1563,7 @@
       "dtstart": "2026-12-20T16:00:00+01:00",
       "dtend": "2026-12-20T17:30:00+01:00",
       "all_day": false,
-      "location": "Sg.Sporthalle Wittkulle, Wittkuller Strasse, 42719 Solingen, Deutschland",
+      "location": "Sg.Sporthalle Wittkulle Alt, Wittkuller Strasse, 42719 Solingen, Deutschland",
       "cancelled": false
     },
     {
